@@ -7,11 +7,11 @@ This repository implements the near-linear algorithms from
 It provides fast, practical code for three classic problems:
 
 - **All-Target Unbounded Knapsack**  
-  For each capacity \(c\in[0..T]\), compute the maximum profit using unlimited copies of each item.
+  For each capacity within some range, compute the maximum profit using unlimited copies of each item.
 - **All-Target CoinChange**  
-  For each sum \(c\in[0..T]\), compute the minimum number of coins needed (or report “unreachable”).
+  For each sum within some range, compute the minimum number of coins needed.
 - **Residue Table**  
-  Given coin denominations \(w_1<w_2<\dots<w_n\), for each residue \(r\in[0..w_1-1]\), find the smallest achievable sum \(s\equiv r\pmod{w_1}\).
+  Given coin denominations, for each residue, find the smallest achievable sum.
 
 ## Key Techniques
 
