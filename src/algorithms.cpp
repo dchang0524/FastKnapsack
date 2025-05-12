@@ -56,45 +56,69 @@ void propagation(
  * For Residue Table, the value of a solution is the sum itself
  */
 void kernelComputation(
-    int n, //the number of coins
-    int u, //the maximum weight of coins
-    const vector<int>& w, //the weights of coins
-    const vector<int>& p, //the profits of coins
-    const vector<int>& order, //the lexicographical order
-    int t, ///the bound for the range we want to compute solutions for 
-    vector<solution>& sol //sol[c] <- properties related to solution for the weight sum = c
+    int n,                              // number of coins
+    int u,                              // maximum coin weight
+    const vector<int>& w,               // weights of the coins (1-indexed)
+    const vector<int>& p,               // profits of the coins  (1-indexed)
+    const vector<int>& order,           // lexicographical order σ[1..n]
+    int /*t*/,                          // (unused) global target bound
+    vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
 ) {
-    int k = (int)floor(2.0*log2(u) + 1.0);
+    int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
     int KU = k * u + 1;
+
+    // prepare sol[0..KU-1]
     sol.assign(KU, solution(n));
+
+    // v[c] = best profit for capacity c so far
     vector<int> v(KU, NEG_INF), f(u+1, NEG_INF);
     v[0] = 0;
     for (int i = 1; i <= n; i++) {
         f[w[order[i]]] = p[order[i]];
     }
 
-    //a convolution is used to update the optimal solutions
-    //the minimum lexicorgraphic order is maintained by using the minimum witnesses for each solution
-    vector<int> v_w, vPrime, minW;
-    vector<ll> aSum;
+    // prep for min-witness tracking
+    vector<int> f_w(u+1, NEG_INF);
+    for (int i = 1; i <= n; i++) {
+        // store (n+1)*f[w] - i so that in the convolution
+        // max_plus(v_w, f_w)[c] ≡ (n+1)*v'[c] - i
+        f_w[w[order[i]]] = (n + 1) * f[w[order[i]]] - i;
+    }
+
+    vector<int> vPrime, v_w(KU, NEG_INF), minW;
     for (int iter = 1; iter <= k; iter++) {
+        // 1) (max,+) convolve to get new profits
         vPrime = maxPlusCnv(v, f);
-        v_w.assign(v.size(), NEG_INF);
-        for (size_t i = 0; i < v.size(); i++) {
-            if (v[i] > NEG_INF) v_w[i] = (n+1)*v[i];
+
+        // 2) build scaled v for witness tracking
+        fill(v_w.begin(), v_w.end(), NEG_INF);
+        for (int c = 0; c < KU; c++) {
+            if (v[c] > NEG_INF) 
+                v_w[c] = (n + 1) * v[c];
         }
-        minW = maxPlusCnv(v_w, f);
-        for (int i = 1; i < KU; i++) {
-            if (i < (int)vPrime.size() && vPrime[i] > NEG_INF) {
-                v[i] = vPrime[i];
-                int cidx = order[minW[i]%(n+1)];
-                int prev = i - w[cidx];
+
+        // 3) convolve to get encoded witnesses
+        minW = maxPlusCnv(v_w, f_w);
+
+        // 4) reconstruct each kernel solution
+        for (int c = 1; c < KU; c++) {
+            if (c < (int)vPrime.size() && vPrime[c] > NEG_INF) {
+                // accept new profit
+                v[c] = vPrime[c];
+
+                // recover the “-i” index from minW[c], then flip it to +i
+                int negI      = minW[c] % (n+1);
+                int witnessI  = ((n+1) - negI) % (n+1);
+                if (witnessI == 0) continue;           // no valid coin
+
+                int coinIdx = order[witnessI];
+                int prev    = c - w[coinIdx];
                 if (prev >= 0) {
-                    sol[i] = sol[prev];
-                    sol[i].svec[cidx]++;
-                    sol[i].weight += w[cidx];
-                    sol[i].value  += p[cidx];
-                    sol[i].size++;
+                    sol[c] = sol[prev];
+                    sol[c].svec[coinIdx]++;
+                    sol[c].weight += w[coinIdx];
+                    sol[c].value  += p[coinIdx];
+                    sol[c].size++;
                 }
             }
         }

@@ -17,8 +17,12 @@ int main(){
     }
 
     // 1) Kernel computation (Alg.2)
-    vector<solution> sol;
+    vector<solution> sol(t+1, solution(n));    // size = t+1
     kernelComputation(n, u, w, p, order, t, sol);
+    sol[0].size   = 1;
+    sol[0].value  = 0;
+    sol[0].weight = 0;
+    sol[0].svec.assign(n+1,0);
 
     // 2) Build support sets for each kernel i
     vector<vector<int>> supp(t+1);
