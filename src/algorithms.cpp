@@ -9,13 +9,19 @@
 #include <unordered_set>
 using namespace std;
 
+typedef long long ll;
+
 // Algorithm 1: Witness Propagation
+/**
+ * Standard Knapsack-DP given some set of solutions (called "kernels")
+ * Gurantees optimal solution due to Optimal Substructure Combinatorial Property
+ */
 void propagation(
-    const vector<int>& w,
-    const vector<int>& p,
-    int t,
-    vector<solution>& sol,
-    const vector<vector<int>>& supp
+    const vector<int>& w, //weight of each coin
+    const vector<int>& p, //the profit of each coin
+    int t, //the bound for the range we want to compute solutions for
+    vector<solution>& sol, //sol[c] <- properties related to solution for the weight sum = c
+    const vector<vector<int>>& supp //supp[c] <- the coins involved in sol[c]
 ) {
     for (int j = 1; j <= t; j++) {
         if (sol[j].size == 0) continue;
@@ -28,9 +34,9 @@ void propagation(
             solution& nxt = sol[j + w[x]];
             if (nxt.size == 0
                 || tmp.value > nxt.value
-                || (tmp.value == nxt.value && lexCmp(tmp, nxt)))
+                || (tmp.value == nxt.value && lexCmp(tmp, nxt))) //lexCmp should take long n time once we replace svec with a map
             {
-                nxt = tmp;
+                nxt = tmp; //when we replace svec to maps, the copying should take log n time since supports are logarithmically sized
             }
             tmp.svec[x]--;
             tmp.value -= p[x];
@@ -40,13 +46,22 @@ void propagation(
 }
 
 // Algorithm 2: Kernel Computation
+/**
+ * Computes the x-kernels for x in 1, ..., 2*logu + 1
+ * A k-kernel is the set of solutions total of k (not necessarily distinct) coins
+ * This specific implementation is only for All-Target Unbounded Knapsack
+ * For All-Target CoinChange and Residue Table replace (max, +) convolutions with Boolean convolution, and use algorithm 4 for finding minimum witnesses
+ * For CoinChange, the value of a solution is just the number of convolutions iterated
+ * For Residue Table, the value of a solution is the sum itself
+ */
 void kernelComputation(
-    int n,int u,
-    const vector<int>& w,
-    const vector<int>& p,
-    const vector<int>& order,
-    int t,
-    vector<solution>& sol
+    int n, //the number of coins
+    int u, //the maximum weight of coins
+    const vector<int>& w, //the weights of coins
+    const vector<int>& p, //the profits of coins
+    const vector<int>& order, //the lexicographical order
+    int t, ///the bound for the range we want to compute solutions for 
+    vector<solution>& sol //sol[c] <- properties related to solution for the weight sum = c
 ) {
     int k = (int)floor(2.0*log2(u) + 1.0);
     int KU = k * u + 1;
@@ -56,8 +71,11 @@ void kernelComputation(
     for (int i = 1; i <= n; i++) {
         f[w[order[i]]] = p[order[i]];
     }
+
+    //a convolution is used to update the optimal solutions
+    //the minimum lexicorgraphic order is maintained by using the minimum witnesses for each solution
     vector<int> v_w, vPrime, minW;
-    vector<long long> aSum;
+    vector<ll> aSum;
     for (int iter = 1; iter <= k; iter++) {
         vPrime = maxPlusCnv(v, f);
         v_w.assign(v.size(), NEG_INF);
@@ -83,6 +101,9 @@ void kernelComputation(
 }
 
 // Algorithm 4: Adaptive Minimum Witness
+/**
+ * Computes the minimum witness of a solution
+ */
 void adaptiveMinWitness(
     const vector<vector<int>>& A,
     const vector<vector<int>>& B,

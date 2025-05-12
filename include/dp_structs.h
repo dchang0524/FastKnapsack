@@ -11,7 +11,7 @@ struct solution {
     int size;            // sum of m_i
     int value;           // total profit
     int weight;          // total weight
-    vector<int> svec;    // multiplicities m_i
+    vector<int> svec;    // multiplicities m_i, change to a map later
 
     solution(int n=0)
       : size(0), value(0), weight(0), svec(n+1,0) {}
