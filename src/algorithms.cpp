@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
+#include <iostream>
 using namespace std;
 
 typedef long long ll;
@@ -61,14 +62,15 @@ void kernelComputation(
     const vector<int>& w,               // weights of the coins (1-indexed)
     const vector<int>& p,               // profits of the coins  (1-indexed)
     const vector<int>& order,           // lexicographical order σ[1..n]
-    int /*t*/,                          // (unused) global target bound
+    int t,                          // (unused) global target bound
     vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
 ) {
     int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
+    cout << "kernel size " << k << endl; 
     int KU = k * u + 1;
 
     // prepare sol[0..KU-1]
-    sol.assign(KU, solution(n));
+    sol.assign(max(KU, t + 1), solution(n));
 
     // v[c] = best profit for capacity c so far
     vector<int> v(KU, NEG_INF), f(u+1, NEG_INF);
@@ -76,6 +78,7 @@ void kernelComputation(
     for (int i = 1; i <= n; i++) {
         f[w[order[i]]] = p[order[i]];
     }
+    cout << "v, f initialized" << endl;
 
     // prep for min-witness tracking
     vector<int> f_w(u+1, NEG_INF);
@@ -84,11 +87,20 @@ void kernelComputation(
         // max_plus(v_w, f_w)[c] ≡ (n+1)*v'[c] - i
         f_w[w[order[i]]] = (n + 1) * f[w[order[i]]] - i;
     }
+    cout << "f_w intialized" << endl;
 
     vector<int> vPrime, v_w(KU, NEG_INF), minW;
-    for (int iter = 1; iter <= k; iter++) {
+    cout << "vPrime, v_w, minW intialized" << endl; 
+    cout << endl;
+
+    for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
+        cout << "iteration: " << iter << endl;
         // 1) (max,+) convolve to get new profits
-        vPrime = maxPlusCnv(v, f);
+        vPrime = maxPlusCnv(v, f); //has size = KU + u - 1
+        cout << "vPrime computed" << endl;
+        // for (int i = 0; i < KU; i++) {
+        //     cout << "c = " << i << " v = " << vPrime[i] << endl; 
+        // }
 
         // 2) build scaled v for witness tracking
         fill(v_w.begin(), v_w.end(), NEG_INF);
@@ -96,13 +108,18 @@ void kernelComputation(
             if (v[c] > NEG_INF) 
                 v_w[c] = (n + 1) * v[c];
         }
+        cout << "v_w filled" << endl;
 
         // 3) convolve to get encoded witnesses
         minW = maxPlusCnv(v_w, f_w);
+        cout << "minW computed" << endl;
+        // for (int i = 0; i < KU; i++) {
+        //     cout << "c = " << i << " (n+1)*v - minWit[c] = " << vPrime[i] << endl; 
+        // }
 
         // 4) reconstruct each kernel solution
         for (int c = 1; c < KU; c++) {
-            if (c < (int)vPrime.size() && vPrime[c] > NEG_INF) {
+            if (vPrime[c] > NEG_INF) {
                 // accept new profit
                 v[c] = vPrime[c];
 
@@ -115,6 +132,12 @@ void kernelComputation(
                 int prev    = c - w[coinIdx];
                 if (prev >= 0) {
                     sol[c] = sol[prev];
+                    sol[c].svec[coinIdx]++;
+                    sol[c].weight += w[coinIdx];
+                    sol[c].value  += p[coinIdx];
+                    sol[c].size++;
+                } else {
+                    sol[c] = sol[0];
                     sol[c].svec[coinIdx]++;
                     sol[c].weight += w[coinIdx];
                     sol[c].value  += p[coinIdx];

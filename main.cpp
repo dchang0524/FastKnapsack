@@ -2,12 +2,14 @@
 #include <vector>
 #include "algorithms.h"
 #include "dp_structs.h"
+#include <cmath>
 using namespace std;
 
 int main(){
     int n, u, t;
     // read number of item types, max weight per item, and max target weight
     cin >> n >> u >> t;
+    cout << "item info inputted" << endl;
 
     // 1-indexed arrays
     vector<int> w(n+1), p(n+1), order(n+1);
@@ -15,15 +17,18 @@ int main(){
         cin >> w[i] >> p[i];
         order[i] = i;                // identity lex order
     }
-
+    cout << "arrays initialized" << endl;
     // 1) Kernel computation (Alg.2)
     vector<solution> sol(t+1, solution(n));    // size = t+1
+    cout << "sol initialized" << endl;
+    
     kernelComputation(n, u, w, p, order, t, sol);
-    sol[0].size   = 1;
-    sol[0].value  = 0;
-    sol[0].weight = 0;
-    sol[0].svec.assign(n+1,0);
+    cout << "kernels computed" << endl;
+    // for (int i = 0; i <= sol.size(); i++) {
+    //     cout << "c = " << i << " v = " << sol[i].value << endl;
+    // }
 
+    cout << endl;
     // 2) Build support sets for each kernel i
     vector<vector<int>> supp(t+1);
     for(int i = 0; i <= t && i < (int)sol.size(); i++){
@@ -40,9 +45,9 @@ int main(){
     // 4) Output results: best profit for each c in [0..t]
     for(int cval = 0; cval <= t; cval++){
         if(cval >= (int)sol.size() || sol[cval].size == 0) {
-            cout << "-inf\n";
+            cout << "c = " << cval <<", v = -inf\n";
         } else {
-            cout << sol[cval].value << "\n";
+            cout << "c = " << cval <<", v = " << sol[cval].value << "\n";
         }
     }
 

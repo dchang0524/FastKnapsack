@@ -2,6 +2,7 @@
 #include <vector>
 #include <climits>
 using namespace std;
+const int NEG_INF = -1000000000; // Negative infinity placeholder
 
 // Naïve Boolean‐count convolution
 vector<int> boolCountConv(const vector<int>& a, const vector<int>& b) {
@@ -35,9 +36,12 @@ vector<long long> intSumConv(
 // (max, +) convolution
 vector<int> maxPlusCnv(const vector<int>& a, const vector<int>& b) {
     int n = (int)a.size(), m = (int)b.size(), N = n + m - 1;
-    vector<int> c(N, INT_MIN);
+    vector<int> c(N, NEG_INF);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
+            if (a[i] == NEG_INF || b[j] == NEG_INF) {
+                continue;
+            }
             c[i + j] = max(c[i + j], a[i] + b[j]);
         }
     }
