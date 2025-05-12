@@ -15,6 +15,7 @@ typedef long long ll;
 /**
  * Standard Knapsack-DP given some set of solutions (called "kernels")
  * Gurantees optimal solution due to Optimal Substructure Combinatorial Property
+ * For All-Target Unbounded Knapsack and All-Target Coinchange
  */
 void propagation(
     const vector<int>& w, //weight of each coin
