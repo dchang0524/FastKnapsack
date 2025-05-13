@@ -26,7 +26,7 @@ v_k = (u_k if k != x, u_k − 1 if k = x). We have sol(j − w_x, σ) = v.
 ## Algorithm 1: Witness Propagation
 By combinatorial property 2, to compute sol(c, σ), we only need to know sol(x, σ), where x = w_{a_1} + ... + w_{a_z}, where {a_1, ..., a_z} = supp(sol(c, σ)). We call the set of values the kernel.
 Assuming we have the solutions to the kernel, we can extend our solutions to [1, ..., t] using the traditional knapsack algorithm, in push DP style (where we update future states based on the current state). The coins at each state in the DP correspond to the support of our solution.
-This algorithm runs in O(t * log t).
+This algorithm runs in O(t * log u).
 ## Algorithm 2: Kernel Computation
 This algorithm computes the solutions to the kernel.
 We simply use O(log_2{u}) convolutions to compute the values of each solutions. For Unbounded Knapsack, we use (min, +) convolution to do this, and for CoinChange and Residue Table, we use boolean convolutions which allows the use of FFT to optimize our runtime.
