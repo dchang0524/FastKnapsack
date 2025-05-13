@@ -13,7 +13,7 @@ It provides fast, practical code for three classic problems:
 - **Residue Table**  
   Given coin denominations, for each residue, find the smallest achievable sum.
 
-# Key Ideas (Summary of “On Problems Related to Unbounded SubsetSum: A Unified Combinatorial Approach”)
+# Key Ideas
 ## Definitions
 1. Let coins 1, ..., n have weights (w_1, ..., w_n) and profits (p_1, ..., p_n)
 2. A solution to a sum c is represented by a vector (m_1, ..., m_n) denoting the multiplicities of each coin such that (m_1 * w_1) + ... + (m_n * w_n) = c and the value of the solution which is (m_1 * p_1) + ... + (m_n * p_n) is maximized.
