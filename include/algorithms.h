@@ -14,11 +14,20 @@ void propagation(
 );
 
 // Algorithm 2: Kernel Computation with Minimum Witness
-void kernelComputation(
+void kernelComputation_knapsack(
     int n, int u,
     const vector<int>& w,
     const vector<int>& p,
     const vector<int>& order,
+    int t,
+    vector<solution>& sol
+);
+
+void kernelComputation_coinchange(
+    int n, int u,
+    vector<int>& w,
+    vector<int>& p,
+    vector<int>& order,
     int t,
     vector<solution>& sol
 );

@@ -17,19 +17,10 @@ int main(){
         cin >> w[i] >> p[i];
         order[i] = i;                // identity lex order
     }
-    cout << "arrays initialized" << endl;
     // 1) Kernel computation (Alg.2)
     vector<solution> sol(t+1, solution());    // size = t+1
-    cout << "sol initialized" << endl;
     
-    kernelComputation(n, u, w, p, order, t, sol);
-    cout << "kernels computed" << endl;
-    // for (int i = 0; i <= sol.size(); i++) {
-    //     cout << "c = " << i << " v = " << sol[i].value << endl;
-    // }
-
-    cout << endl;
-
+    kernelComputation_knapsack(n, u, w, p, order, t, sol);
     // 2) Propagate to fill all targets up to t (Alg.1)
     propagation(w, p, t, sol);
 
