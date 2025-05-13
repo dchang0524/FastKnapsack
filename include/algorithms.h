@@ -10,8 +10,7 @@ void propagation(
     const vector<int>& w,
     const vector<int>& p,
     int t,
-    vector<solution>& sol,
-    const vector<vector<int>>& supp
+    vector<solution>& sol
 );
 
 // Algorithm 2: Kernel Computation with Minimum Witness

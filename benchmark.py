@@ -23,19 +23,20 @@ def compile_solver():
 
 def generate_instance(n, u, t):
     # Random weights in [1, u], random profits in [1, u]
-    w = [random.randint(1, u) for _ in range(n)]
-    p = [random.randint(1, u) for _ in range(n)]
+    w = [random.randint(1, u) for _ in range(u)]
+    p = [random.randint(1, u) for _ in range(u)]
     lines = [f"{n} {u} {t}\n"]
     for wi, pi in zip(w, p):
         lines.append(f"{wi} {pi}\n")
     return "".join(lines)
 
 def benchmark(solver="./knapsack_solver", trials=3):
-    Ns = [2**i for i in range(10, 17)]  # sample T values from 1k to 128k
+    Ns = [2**i for i in range(10, 20)]  # sample T values from 1k to 128k
     avg_times = []
     for T in Ns:
-        u = T // 2 or 1
-        n = min(20, T)  # keep n small relative to T
+        u = 1000
+        #u = max(1, min(T // 2, 1000))
+        n = 500
         total = 0.0
         for _ in range(trials):
             inp = generate_instance(n, u, T)

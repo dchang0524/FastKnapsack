@@ -1,23 +1,30 @@
-#ifndef DP_STRUCTS_H
-#define DP_STRUCTS_H
+#pragma once
 
-#include <vector>
+#include <map>
+#include <iostream>
 using namespace std;
 
-const int NEG_INF = -1000000000; // Negative infinity placeholder
+/// Represents one “solution” (a multiset of coin‐types plus its aggregate stats).
+class solution {
+public:
+    int size;               ///< total number of coins used
+    int value;              ///< total profit
+    int weight;             ///< total weight
+    map<int,int> svec; ///< map from coin‐index → count
 
-// Represents a solution vector (counts m_i) with its total value & weight.
-struct solution {
-    int size;            // sum of m_i
-    int value;           // total profit
-    int weight;          // total weight
-    vector<int> svec;    // multiplicities m_i, change to a map later
+    /// Default‐construct an empty solution.
+    solution();
 
-    solution(int n=0)
-      : size(0), value(0), weight(0), svec(n+1,0) {}
+    /// Add one coin of index i, with given weight & profit.
+    void addCoin(int i, int wgt, int prof);
+
+    /// Dump contents for debugging.
+    void dump() const;
+
+    /// Lexicographically compare two solutions by ascending coin‐index order.
+    /// Returns true iff s1(this) < s2.
+    bool lexCmp(const solution& s2);
+
+    //Copies s1 over to s2
+    void copy(solution &s2);
 };
-
-// Lexicographical compare: return true if s1 < s2 under some fixed order.
-bool lexCmp(const solution& s1, const solution& s2);
-
-#endif // DP_STRUCTS_H

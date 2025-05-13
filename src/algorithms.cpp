@@ -12,6 +12,8 @@ using namespace std;
 
 typedef long long ll;
 
+const int NEG_INF = -1000000000; // Negative infinity placeholder
+
 // Algorithm 1: Witness Propagation
 /**
  * Standard Knapsack-DP given some set of solutions (called "kernels")
@@ -22,27 +24,26 @@ void propagation(
     const vector<int>& w, //weight of each coin
     const vector<int>& p, //the profit of each coin
     int t, //the bound for the range we want to compute solutions for
-    vector<solution>& sol, //sol[c] <- properties related to solution for the weight sum = c
-    const vector<vector<int>>& supp //supp[c] <- the coins involved in sol[c]
+    vector<solution>& sol //sol[c] <- properties related to solution for the weight sum = c
 ) {
     for (int j = 1; j <= t; j++) {
         if (sol[j].size == 0) continue;
-        solution tmp = sol[j];
-        for (int x : supp[j]) {
-            if (j + w[x] > t) continue;
-            tmp.svec[x]++;
-            tmp.value += p[x];
-            tmp.weight += w[x];
-            solution& nxt = sol[j + w[x]];
-            if (nxt.size == 0
-                || tmp.value > nxt.value
-                || (tmp.value == nxt.value && lexCmp(tmp, nxt))) //lexCmp should take long n time once we replace svec with a map
+        for (auto const C : sol[j].svec) { //use the svec instead of supp
+            int x = C.first;
+            int nxt = j + w[x];
+            if (nxt > t) continue;
+            sol[j].svec[x]++;
+            sol[j].value += p[x];
+            sol[j].weight += w[x];
+            if (sol[nxt].size == 0
+                || sol[j].value > sol[nxt].value
+                || (sol[j].value == sol[nxt].value && sol[j].lexCmp(sol[nxt]))) //lexCmp should take (log n)^2 time
             {
-                nxt = tmp; //when we replace svec to maps, the copying should take log n time since supports are logarithmically sized
+                sol[j].copy(sol[nxt]);
             }
-            tmp.svec[x]--;
-            tmp.value -= p[x];
-            tmp.weight -= w[x];
+            sol[j].svec[x]--;
+            sol[j].value -= p[x];
+            sol[j].weight -= w[x];
         }
     }
 }
@@ -66,11 +67,11 @@ void kernelComputation(
     vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
 ) {
     int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
-    cout << "kernel size " << k << endl; 
+    // cout << "kernel size " << k << endl; 
     int KU = k * u + 1;
 
     // prepare sol[0..KU-1]
-    sol.assign(max(KU, t + 1), solution(n));
+    sol.assign(max(KU, t + 1), solution());
 
     // v[c] = best profit for capacity c so far
     vector<int> v(KU, NEG_INF), f(u+1, NEG_INF);
@@ -78,7 +79,7 @@ void kernelComputation(
     for (int i = 1; i <= n; i++) {
         f[w[order[i]]] = p[order[i]];
     }
-    cout << "v, f initialized" << endl;
+    // cout << "v, f initialized" << endl;
 
     // prep for min-witness tracking
     vector<int> f_w(u+1, NEG_INF);
@@ -87,17 +88,17 @@ void kernelComputation(
         // max_plus(v_w, f_w)[c] ≡ (n+1)*v'[c] - i
         f_w[w[order[i]]] = (n + 1) * f[w[order[i]]] - i;
     }
-    cout << "f_w intialized" << endl;
+    // cout << "f_w intialized" << endl;
 
     vector<int> vPrime, v_w(KU, NEG_INF), minW;
-    cout << "vPrime, v_w, minW intialized" << endl; 
-    cout << endl;
+    // cout << "vPrime, v_w, minW intialized" << endl; 
+    // cout << endl;
 
     for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
         cout << "iteration: " << iter << endl;
         // 1) (max,+) convolve to get new profits
         vPrime = maxPlusCnv(v, f); //has size = KU + u - 1
-        cout << "vPrime computed" << endl;
+        //cout << "vPrime computed" << endl;
         // for (int i = 0; i < KU; i++) {
         //     cout << "c = " << i << " v = " << vPrime[i] << endl; 
         // }
@@ -108,14 +109,12 @@ void kernelComputation(
             if (v[c] > NEG_INF) 
                 v_w[c] = (n + 1) * v[c];
         }
-        cout << "v_w filled" << endl;
+        //cout << "v_w filled" << endl;
 
         // 3) convolve to get encoded witnesses
         minW = maxPlusCnv(v_w, f_w);
-        cout << "minW computed" << endl;
-        // for (int i = 0; i < KU; i++) {
-        //     cout << "c = " << i << " (n+1)*v - minWit[c] = " << vPrime[i] << endl; 
-        // }
+        //cout << "minW computed" << endl;
+
 
         // 4) reconstruct each kernel solution
         for (int c = 1; c < KU; c++) {
@@ -131,17 +130,10 @@ void kernelComputation(
                 int coinIdx = order[witnessI];
                 int prev    = c - w[coinIdx];
                 if (prev >= 0) {
-                    sol[c] = sol[prev];
-                    sol[c].svec[coinIdx]++;
-                    sol[c].weight += w[coinIdx];
-                    sol[c].value  += p[coinIdx];
-                    sol[c].size++;
+                    sol[prev].copy(sol[c]);
+                    sol[c].addCoin(coinIdx, w[coinIdx], p[coinIdx]);
                 } else {
-                    sol[c] = sol[0];
-                    sol[c].svec[coinIdx]++;
-                    sol[c].weight += w[coinIdx];
-                    sol[c].value  += p[coinIdx];
-                    sol[c].size++;
+                    sol[c].addCoin(coinIdx, w[coinIdx], p[coinIdx]);
                 }
             }
         }
