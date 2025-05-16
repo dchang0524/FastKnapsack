@@ -24,3 +24,5 @@ add_executable(knapsack_solver
 
 # Link in the core library
 target_link_libraries(knapsack_solver PRIVATE core)
+
+
