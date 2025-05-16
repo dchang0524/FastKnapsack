@@ -3,6 +3,8 @@ import subprocess
 import time
 import random
 import sys
+import re              # ← add this
+
 
 # List of target values to test
 Ts = [2**i for i in range(10, 17)]  # 1024, 2048, ..., 65536
@@ -40,22 +42,29 @@ def build_input(weights, profits, T):
     return "".join(lines)
 
 def parse_debug(stderr: str):
-    # expects exactly these four lines in stderr:
+    # expects exactly these lines in stderr:
     # Kernel computation took X s
     # Max kernel support size: Y
-    # Witness propagation took Z s
-    # Total elapsed time: W s
+    # Entries in solution with max support size (index Z): (A, B) (C, D) ...
     ktime = maxsup = ptime = tot = None
+    max_entries = []
+    pair_pattern = re.compile(r"\((\d+), (\d+)\)")  # Regex to match (key, value) pairs
+
     for line in stderr.splitlines():
         if line.startswith("Kernel computation took"):
             ktime = float(line.split()[3])
         elif line.startswith("Max kernel support size"):
             maxsup = int(line.split()[4])
+        elif line.startswith("Entries in solution with max support size"):
+            max_entries = [
+                (int(m.group(1)), int(m.group(2)))
+                for m in pair_pattern.finditer(line)
+            ]
         elif line.startswith("Witness propagation took"):
             ptime = float(line.split()[3])
         elif line.startswith("Total elapsed time"):
             tot = float(line.split()[3])
-    return ktime, maxsup, ptime, tot
+    return ktime, maxsup, ptime, tot, max_entries
 
 def run_benchmark(trials=1):
     print(" T     |   KTime   MaxSup   PTime   OptTotal   TradTime   OK?")
@@ -74,9 +83,9 @@ def run_benchmark(trials=1):
             capture_output=True,
             check=True
         )
-        ktime, maxsup, ptime, opttot = parse_debug(proc.stderr)
+        ktime, maxsup, ptime, opttot, svec = parse_debug(proc.stderr)
         out_opt = proc.stdout.splitlines()
-
+        #print("svec:", svec)
         # traditional solver (just measure wall time, but also capture stdout)
         trad_acc = 0.0
         out_trad = None
@@ -93,7 +102,13 @@ def run_benchmark(trials=1):
             out_trad = proc2.stdout.splitlines()
         trad_time = trad_acc / trials
 
-        ok = "✔" if out_opt == out_trad else "✘"
+        ok = "Y" if out_opt == out_trad else "N"
+        if out_opt != out_trad:
+            #print the first mistmatch line
+            for i, (o1, o2) in enumerate(zip(out_opt, out_trad)):
+                if o1 != o2:
+                    print(f"Mismatch at line {i}: '{o1}' vs '{o2}'")
+                    break
 
         print(f"{T:6d} | {ktime:8.4f} {maxsup:8d} {ptime:8.4f} {opttot:9.4f} {trad_time:10.4f} {ok}")
 

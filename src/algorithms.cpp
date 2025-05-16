@@ -66,7 +66,6 @@ void kernelComputation_knapsack(
     int t,                          // (unused) global target bound
     vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
 ) {
-    
     int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
     // cout << "kernel size " << k << endl; 
     int KU = k * u + 1;
@@ -82,27 +81,24 @@ void kernelComputation_knapsack(
     }
     // cout << "v, f initialized" << endl;
 
-    // prep for min-witness tracking
+    //For min-witness tracking
     vector<int> f_w(u+1, NEG_INF);
     for (int i = 1; i <= n; i++) {
         // store (n+1)*f[w] - i so that in the convolution
         // max_plus(v_w, f_w)[c] ≡ (n+1)*v'[c] - i
         f_w[w[order[i]]] = (n + 1) * f[w[order[i]]] - i;
     }
-    // cout << "f_w intialized" << endl;
+    //compute the inverse of order so that we can use the order to find the minimum witness
+    vector<int> inverseOrder(n+1);
+    for (int i = 1; i <= n; i++) {
+        inverseOrder[order[i]] = i;
+    }
 
     vector<int> vPrime, v_w(KU, NEG_INF), minW;
-    // cout << "vPrime, v_w, minW intialized" << endl; 
-    // cout << endl;
 
     for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
-        cout << "iteration: " << iter << endl;
         // 1) (max,+) convolve to get new profits
         vPrime = maxPlusCnv(v, f); //has size = KU + u - 1
-        //cout << "vPrime computed" << endl;
-        // for (int i = 0; i < KU; i++) {
-        //     cout << "c = " << i << " v = " << vPrime[i] << endl; 
-        // }
 
         // 2) build scaled v for witness tracking
         fill(v_w.begin(), v_w.end(), NEG_INF);
@@ -110,12 +106,9 @@ void kernelComputation_knapsack(
             if (v[c] > NEG_INF) 
                 v_w[c] = (n + 1) * v[c];
         }
-        //cout << "v_w filled" << endl;
 
         // 3) convolve to get encoded witnesses
         minW = maxPlusCnv(v_w, f_w);
-        //cout << "minW computed" << endl;
-
 
         // 4) reconstruct each kernel solution
         for (int c = 1; c < KU; c++) {
@@ -128,7 +121,7 @@ void kernelComputation_knapsack(
                 int witnessI  = ((n+1) - negI) % (n+1);
                 if (witnessI == 0) continue;           // no valid coin
 
-                int coinIdx = order[witnessI];
+                int coinIdx = inverseOrder[witnessI];
                 int prev    = c - w[coinIdx];
                 if (prev >= 0) {
                     sol[prev].copy(sol[c]);

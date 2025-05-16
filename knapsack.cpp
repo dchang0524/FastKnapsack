@@ -34,10 +34,21 @@ int main(){
 
     // compute max support size over the kernels
     int maxSize = 0;
+    int maxInd = -1;
     for (int i = 0; i <= t && i < (int)sol.size(); i++) {
         maxSize = max(maxSize, static_cast<int>(sol[i].svec.size()));
+        maxInd = i;
     }
-    cerr << "Max kernel support size: " << maxSize << "\n";
+    // Print the entries of the solution with the maximum support size
+    if (maxInd != -1) {
+        cerr << "Max kernel support size: " << maxSize << "\n";
+        cerr << "Entries in solution with max support size (index " << maxInd << "): ";
+        for (const auto& entry : sol[maxInd].svec) {
+            cerr << "(" << entry.first << ", " << entry.second << ") "; // Format pair as (key, value)
+        }
+        cerr << "\n";
+    }
+   
 
     // 2) Witness‐propagation (Alg.1)
     {
