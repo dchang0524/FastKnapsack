@@ -7,11 +7,11 @@ import re              # ← add this
 
 
 # List of target values to test
-Ts = [2**i for i in range(10, 17)]  # 1024, 2048, ..., 65536
+Ts = [2**i for i in range(10, 23)]
 
 # Problem size parameters
-n = 500   # number of coin types
-u = 500   # maximum coin weight/value
+n = 1000   # number of coin types
+u = 1000   # maximum coin weight/value
 
 def compile_solvers():
     # optimized solver with debug prints
@@ -66,7 +66,7 @@ def parse_debug(stderr: str):
             tot = float(line.split()[3])
     return ktime, maxsup, ptime, tot, max_entries
 
-def run_benchmark(trials=1):
+def run_benchmark(trials=3):
     print(" T     |   KTime   MaxSup   PTime   OptTotal   TradTime   OK?")
     print("-------+-------------------------------------------------")
     # generate one coin set once

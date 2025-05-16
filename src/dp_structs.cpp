@@ -50,6 +50,7 @@ void solution::copy(solution &s2) {
     s2.size = size;
     s2.value = value;
     s2.weight = weight;
+    s2.svec.clear();
     for (const auto c : svec) {
         s2.svec[c.first] = c.second;
     }

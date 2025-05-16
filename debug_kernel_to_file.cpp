@@ -96,7 +96,7 @@ int main(){
                 int coinIdx = order[witnessI];
                 int prev    = c - w[coinIdx];
                 if(prev >= 0){
-                    sol[c].copy(sol[prev]);
+                    sol[prev].copy(sol[c]);
                 }
                 sol[c].addCoin(coinIdx, w[coinIdx], p[coinIdx]);
             }
@@ -111,6 +111,31 @@ int main(){
                   <<",v="<<sol[c].value
                   <<",w="<<sol[c].weight<<"]";
             }
+        }
+        out << "\n";
+        
+        //output max support size
+        int maxSize = 0;
+        int maxInd = -1;
+        for (int i = 0; i <= t && i < (int)sol.size(); i++) {
+            //count the number of distinct coins in the solution
+            int curr = 0;
+            for (const auto& entry : sol[i].svec) {
+                if (entry.second > 0) {
+                    curr++;
+                }
+            }
+            maxSize = max(maxSize, curr);
+            if (curr == maxSize) {
+                maxInd = i;
+            }
+        }
+        out << "Max kernel support size: " << maxSize << "\n";
+        out << "Max kernel index: " << maxInd << "\n";
+        //print the entries of the solution with the maximum support size
+        out << "Entries in solution with max support size (index " << maxInd << "): ";
+        for (const auto& entry : sol[maxInd].svec) {
+            out << "(" << entry.first << ", " << entry.second << ") "; // Format pair as (key, value)
         }
         out << "\n\n";
     }
