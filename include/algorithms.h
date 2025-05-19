@@ -37,8 +37,8 @@ void kernelComputation_coinchange(
 
 // Algorithm 4: Adaptive Minimum Witness (boolean‐only version)
 void adaptiveMinWitness(
-    const vector<vector<int>>& A,
-    const vector<vector<int>>& B,
+    const vector<vector<int>>& a,
+    const vector<vector<int>>& b,
     vector<vector<int>>& c,
     vector<int>& sigma
 );

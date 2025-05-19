@@ -7,7 +7,7 @@
 // Performs the "peel" to extract up to k witnesses per slot.
 // F: family of R subsets, z[A][i]=count, mA[A][i]=sum
 vector<vector<int>> peelWitnesses(
-    const vector<vector<int>>& F,
+    vector<vector<int>>& F,
     vector<vector<int>>& z,
     vector<vector<int>>& mA,
     int universeSize,
@@ -16,9 +16,9 @@ vector<vector<int>> peelWitnesses(
 
 // Wraps the two‐convolutions + peel to solve the k‐reconstruction problem.
 vector<vector<int>> k_reconstruction(
-    const vector<int>& a,
-    const vector<int>& b,
-    const vector<vector<int>>& F,
+    vector<int>& a,
+    vector<int>& b,
+    vector<vector<int>>& F,
     int k
 );
 

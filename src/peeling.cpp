@@ -1,7 +1,7 @@
 #include "peeling.h"
 
 vector<vector<int>> peelWitnesses(
-    const vector<vector<int>>& F,
+    vector<vector<int>>& F,
     vector<vector<int>>& z,
     vector<vector<int>>& mA,
     int universeSize,
@@ -50,9 +50,9 @@ vector<vector<int>> peelWitnesses(
 }
 
 vector<vector<int>> k_reconstruction(
-    const vector<int>& a,
-    const vector<int>& b,
-    const vector<vector<int>>& F,
+    vector<int>& a,
+    vector<int>& b,
+    vector<vector<int>>& F,
     int k
 ) {
     int n = (int)a.size();
