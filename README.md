@@ -19,6 +19,7 @@ It provides fast, practical code for three classic problems:
 2. A solution to a sum c is represented by a vector (m_1, ..., m_n) denoting the multiplicities of each coin such that (m_1 * w_1) + ... + (m_n * w_n) = c and the value of the solution which is (m_1 * p_1) + ... + (m_n * p_n) is maximized.
 3. sol(j, σ) denotes the solution (m_1, ..., m_n) that is minized under the lexicorgraphical order of σ, where σ is a permutation of (1, ..., n).
 4. supp(sol(j, σ)) denotes support of sol(j,σ), which is the set of coins that have nonzero multiplicities in sol(j, σ).
+5. A "witness" of a convolution is a term that contributed to the nonzero term in the result convolution.
 ## Combinatorial Properties
 1. For any lexical order σ and any feasible target j, |supp(sol(j, σ))| ≤ log_2{u} + 1
 2. For any lexical order σ, a feasible target j ∈ [1, t] and a “witness” x ∈ supp(sol(j, σ)), let sol(j, σ) = (u_1, · · · , u_n). Define (v_1, · · · , v_n) as follows:
