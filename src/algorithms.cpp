@@ -60,7 +60,7 @@ void kernelComputation_knapsack(
     sol.assign(max(KU, t + 1), solution());
 
     // v[c] = best profit for capacity c so far
-    vector<int> v(KU, NEG_INF), f(u+1, NEG_INF);
+    vector<ll> v(KU, NEG_INF), f(u+1, NEG_INF);
     v[0] = 0;
     for (int i = 1; i <= n; i++) {
         f[w[order[i]]] = p[order[i]];
@@ -68,7 +68,7 @@ void kernelComputation_knapsack(
     // cout << "v, f initialized" << endl;
 
     //For min-witness tracking
-    vector<int> f_w(u+1, NEG_INF);
+    vector<ll> f_w(u+1, NEG_INF);
     for (int i = 1; i <= n; i++) {
         // store (n+1)*f[w] - i so that in the convolution
         // max_plus(v_w, f_w)[c] ≡ (n+1)*v'[c] - i
@@ -80,7 +80,7 @@ void kernelComputation_knapsack(
         inverseOrder[order[i]] = i;
     }
 
-    vector<int> vPrime, v_w(KU, NEG_INF), minW;
+    vector<ll> vPrime, v_w(KU, NEG_INF), minW;
 
     for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
         // 1) (max,+) convolve to get new profits
@@ -155,7 +155,7 @@ void kernelComputation_coinchange(
                 if (sol[i].value == 0) {
                     sol[i].value = -iter;
                 } else {
-                    sol[i].value = max(sol[i].value, -iter);
+                    sol[i].value = max((int)sol[i].value, -iter);
                 }
             }
         }

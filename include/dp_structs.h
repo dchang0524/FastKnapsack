@@ -5,10 +5,10 @@
 /// Represents one “solution” (a multiset of coin‐types plus its aggregate stats).
 class solution {
 public:
-    int size;               ///< total number of coins used
-    int value;              ///< total profit
-    int weight;             ///< total weight
-    map<int,int> svec; ///< map from coin‐index → count
+    ll size;               ///< total number of coins used
+    ll value;              ///< total profit
+    ll weight;             ///< total weight
+    map<int,ll> svec; ///< map from coin‐index → count
 
     /// Default‐construct an empty solution.
     solution();

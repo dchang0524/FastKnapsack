@@ -1,6 +1,7 @@
 // src/traditional.cpp
 #include <bits/stdc++.h>
 using namespace std;
+typedef long long ll;
 
 // a very straightforward unbounded‐knapsack: 
 // dp[c] = max profit with total weight exactly c, or -inf if impossible.
@@ -15,7 +16,7 @@ int main(){
         cin>>w[i]>>p[i];
     }
     const int NEG_INF = -1000000000;
-    vector<int> dp(t+1, NEG_INF);
+    vector<ll> dp(t+1, NEG_INF);
     dp[0] = 0;
     // classic unbounded DP: for each coin, for c from w…t
     for(int i=1;i<=n;i++){

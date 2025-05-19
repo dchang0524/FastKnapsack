@@ -30,9 +30,9 @@ vector<long long> intSumConv(
 }
 
 // (max, +) convolution
-vector<int> maxPlusCnv(const vector<int>& a, const vector<int>& b) {
+vector<ll> maxPlusCnv(const vector<ll>& a, const vector<ll>& b) {
     int n = (int)a.size(), m = (int)b.size(), N = n + m - 1;
-    vector<int> c(N, NEG_INF);
+    vector<ll> c(N, NEG_INF);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             if (a[i] == NEG_INF || b[j] == NEG_INF) {

@@ -4,10 +4,12 @@ import time
 import random
 import sys
 import re              # ← add this
+import matplotlib.pyplot as plt
+
 
 
 # List of target values to test
-Ts = [2**i for i in range(10, 23)]
+Ts = [2**i for i in range(10, 25)]
 
 # Problem size parameters
 n = 1000   # number of coin types
@@ -67,6 +69,9 @@ def parse_debug(stderr: str):
     return ktime, maxsup, ptime, tot, max_entries
 
 def run_benchmark(trials=3):
+    # storage for plotting
+    opt_totals  = []
+    trad_totals = []
     print(" T     |   KTime   MaxSup   PTime   OptTotal   TradTime   OK?")
     print("-------+-------------------------------------------------")
     # generate one coin set once
@@ -111,6 +116,19 @@ def run_benchmark(trials=3):
                     break
 
         print(f"{T:6d} | {ktime:8.4f} {maxsup:8d} {ptime:8.4f} {opttot:9.4f} {trad_time:10.4f} {ok}")
+        # record for plotting
+        opt_totals.append(opttot)
+        trad_totals.append(trad_time)
+    #plot
+    plt.figure()
+    plt.plot(Ts, opt_totals)
+    plt.plot(Ts, trad_totals)
+    plt.xlabel("Target value T")
+    plt.ylabel("Run time (s)")
+    plt.legend(["Optimized knapsack", "Traditional DP"])
+    plt.title("Knapsack: Optimized vs Traditional run time. u = n = 1000")
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     random.seed(0)
