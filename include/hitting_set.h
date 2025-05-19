@@ -1,8 +1,7 @@
 #ifndef HITTING_SET_H
 #define HITTING_SET_H
 
-#include <vector>
-using namespace std;
+#include "constants.h"
 
 // Given `sets` (u subsets of [0..n)), each of size ≥ R,
 // returns a hitting set H ⊆ [0..n) with |H| ≤ ⌈(n/R)·ln(u)⌉.

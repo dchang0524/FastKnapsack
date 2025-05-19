@@ -1,18 +1,4 @@
 #include "algorithms.h"
-#include "convolution.h"
-#include "dp_structs.h"
-#include "peeling.h"
-#include "hitting_set.h"
-#include <cmath>
-#include <algorithm>
-#include <queue>
-#include <unordered_set>
-#include <iostream>
-using namespace std;
-
-typedef long long ll;
-
-const int NEG_INF = -1000000000; // Negative infinity placeholder
 
 // Algorithm 1: Witness Propagation
 /**

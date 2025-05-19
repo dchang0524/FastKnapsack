@@ -1,8 +1,4 @@
 #include "convolution.h"
-#include <vector>
-#include <climits>
-using namespace std;
-const int NEG_INF = -1000000000; // Negative infinity placeholder
 
 // Naïve Boolean‐count convolution
 vector<int> boolCountConv(const vector<int>& a, const vector<int>& b) {

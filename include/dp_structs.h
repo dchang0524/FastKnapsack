@@ -1,8 +1,6 @@
 #pragma once
 
-#include <map>
-#include <iostream>
-using namespace std;
+#include "constants.h"
 
 /// Represents one “solution” (a multiset of coin‐types plus its aggregate stats).
 class solution {

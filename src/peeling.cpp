@@ -1,8 +1,4 @@
 #include "peeling.h"
-#include "convolution.h"
-#include <vector>
-#include <queue>
-using namespace std;
 
 vector<vector<int>> peelWitnesses(
     const vector<vector<int>>& F,

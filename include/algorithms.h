@@ -1,9 +1,12 @@
 #ifndef ALGORITHMS_H
 #define ALGORITHMS_H
 
-#include <vector>
+#include "constants.h"
 #include "dp_structs.h"
-using namespace std;
+#include "convolution.h"
+#include "dp_structs.h"
+#include "peeling.h"
+#include "hitting_set.h"
 
 // Algorithm 1: Witness Propagation
 void propagation(

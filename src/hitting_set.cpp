@@ -1,8 +1,4 @@
 #include "hitting_set.h"
-#include <vector>
-#include <algorithm>
-#include <cmath>
-using namespace std;
 
 vector<int> computeHittingSet(
     const vector<vector<int>>& sets,

@@ -1,8 +1,8 @@
 #ifndef PEELING_H
 #define PEELING_H
 
-#include <vector>
-using namespace std;
+#include "constants.h"
+#include "convolution.h"
 
 // Performs the "peel" to extract up to k witnesses per slot.
 // F: family of R subsets, z[A][i]=count, mA[A][i]=sum

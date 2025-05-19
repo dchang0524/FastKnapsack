@@ -1,8 +1,7 @@
 #ifndef CONVOLUTION_H
 #define CONVOLUTION_H
 
-#include <vector>
-using namespace std;
+#include "constants.h"
 
 // Naïve boolean‐count convolution (replaceable with FFT)
 vector<int> boolCountConv(const vector<int>& a, const vector<int>& b);
