@@ -212,6 +212,5 @@ void adaptiveMinWitness(
         //recompute c
     }
     //if witnesses[i][j].size() > 1, manually compute its minimum witness using sigma
-    //
 }
 
