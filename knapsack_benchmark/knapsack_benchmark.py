@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
+import os
 import subprocess
 import time
 import random
 import sys
-import re              # ← add this
+import re
 import matplotlib.pyplot as plt
 
-
+# --- directory setup -----------------------------------------
+# this script now lives in ./knapsack_benchmark/
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+#ROOT_DIR   = os.path.dirname(SCRIPT_DIR)
+# --------------------------------------------------------------
 
 # List of target values to test
 Ts = [2**i for i in range(10, 25)]
@@ -18,16 +23,21 @@ u = 1000   # maximum coin weight/value
 def compile_solvers():
     # optimized solver with debug prints
     subprocess.run([
-        "g++-14", "-std=c++20", "-O2", "-Iinclude",
-        "src/convolution.cpp", "src/witness.cpp", "src/hitting_set.cpp",
-        "src/dp_structs.cpp", "src/algorithms.cpp", "knapsack.cpp",
-        "-o", "knapsack_solver"
+        "g++-14", "-std=c++20", "-O2",
+        "-I", os.path.join(SCRIPT_DIR, "..", "include"),
+        os.path.join(SCRIPT_DIR, "..", "src", "convolution.cpp"),
+        os.path.join(SCRIPT_DIR, "..", "src", "witness.cpp"),
+        os.path.join(SCRIPT_DIR, "..", "src", "hitting_set.cpp"),
+        os.path.join(SCRIPT_DIR, "..", "src", "dp_structs.cpp"),
+        os.path.join(SCRIPT_DIR, "..", "src", "algorithms.cpp"),
+        os.path.join(SCRIPT_DIR, "knapsack.cpp"),
+        "-o", os.path.join(SCRIPT_DIR, "knapsack_solver")
     ], check=True)
     # classic DP solver
     subprocess.run([
         "g++-14", "-std=c++20", "-O2",
-        "traditional_knapsack.cpp",
-        "-o", "knapsack_traditional"
+        os.path.join(SCRIPT_DIR, "traditional_knapsack.cpp"),
+        "-o", os.path.join(SCRIPT_DIR, "knapsack_traditional")
     ], check=True)
 
 def generate_coins(n, u):
