@@ -10,17 +10,18 @@ void propagation(
     const vector<int>& w, //weight of each coin
     const vector<int>& p, //the profit of each coin
     int t, //the bound for the range we want to compute solutions for
-    vector<solution>& sol //sol[c] <- properties related to solution for the weight sum = c
+    vector<solution>& sol, //sol[c] <- properties related to solution for the weight sum = c
+    const vector<int>& order //the lexicographical order of the coins
 ) {
     for (int j = 1; j <= t; j++) {
         if (sol[j].size == 0) continue;
         for (auto const C : sol[j].svec) { //use the svec instead of supp
             int x = C.first;
-            int nxt = j + w[x];
+            int nxt = j + w[order[x]];
             if (nxt > t) continue;
             sol[j].svec[x]++;
-            sol[j].value += p[x];
-            sol[j].weight += w[x];
+            sol[j].value += p[order[x]];
+            sol[j].weight += w[order[x]];
             if (sol[nxt].size == 0
                 || sol[j].value > sol[nxt].value
                 || (sol[j].value == sol[nxt].value && sol[j].lexCmp(sol[nxt]))) //lexCmp should take (log n)^2 time
@@ -28,8 +29,8 @@ void propagation(
                 sol[j].copy(sol[nxt]);
             }
             sol[j].svec[x]--;
-            sol[j].value -= p[x];
-            sol[j].weight -= w[x];
+            sol[j].value -= p[order[x]];
+            sol[j].weight -= w[order[x]];
         }
     }
 }
@@ -118,6 +119,62 @@ void kernelComputation_knapsack(
     }
 }
 
+void kernelComputation_coinchange_simple(
+    int n,                              // number of coins
+    int u,                              // maximum coin weight
+    const vector<int>& w,               // weights of the coins (1-indexed)
+    const vector<int>& p,               // profits of the coins  (1-indexed)
+    vector<int>& order,           // lexicographical order σ[1..n]
+    int t,                          // (unused) global target bound
+    vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
+) {
+    int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
+    // cout << "kernel size " << k << endl; 
+    int KU = k * u + 1;
+
+    // prepare sol[0..KU-1]
+    sol.assign(max(KU, t + 1), solution());
+
+    // v[c] = can reach capacity c so far
+    vector<int> v(KU), f(u+1);
+    v[0] = 0;
+    for (int i = 1; i <= n; i++) {
+        f[w[order[i]]] = p[order[i]];
+    }
+
+    vector<int> inverseOrder(n+1);
+    for (int i = 1; i <= n; i++) {
+        inverseOrder[order[i]] = i;
+    }
+
+    vector<int> vPrime;
+    for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
+        // 1) boolean convolve to get new reachable capacities
+        vPrime = boolCnv(v, f); //has size = KU + u - 1
+
+        // 2) Find minimum witness for each reachable capacity
+        vector<int> minW = minimum_witness_boolCnv_ordered(vPrime, f, order);
+
+        // 3) reconstruct each kernel solution
+        for (int c = 1; c < KU; c++) {
+            if (vPrime[c] && v[c] == 0) {
+                // accept new reachable capacity
+                v[c] = vPrime[c];
+
+                // find the minimum witness 
+                int witnessI = minW[c];
+
+                int coinIdx = inverseOrder[witnessI];
+                int prev    = c - w[coinIdx];
+                if (prev >= 0) {
+                    sol[prev].copy(sol[c]);
+                }
+                sol[c].addCoin(coinIdx, w[coinIdx], -1); //note in coinchange, the profit array is just -1
+            }
+        }
+    }
+}
+
 void kernelComputation_coinchange(
     int n,                              // number of coins
     int u,                              // maximum coin weight
@@ -179,7 +236,6 @@ void kernelComputation_coinchange(
             }
         }
     }
-
 }
 // Algorithm 4: Adaptive Minimum Witness
 /**

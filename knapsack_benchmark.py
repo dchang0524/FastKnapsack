@@ -19,7 +19,7 @@ def compile_solvers():
     # optimized solver with debug prints
     subprocess.run([
         "g++-14", "-std=c++20", "-O2", "-Iinclude",
-        "src/convolution.cpp", "src/peeling.cpp", "src/hitting_set.cpp",
+        "src/convolution.cpp", "src/witness.cpp", "src/hitting_set.cpp",
         "src/dp_structs.cpp", "src/algorithms.cpp", "knapsack.cpp",
         "-o", "knapsack_solver"
     ], check=True)

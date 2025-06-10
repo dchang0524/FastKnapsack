@@ -53,7 +53,7 @@ int main(){
     // 2) Witness‐propagation (Alg.1)
     {
         auto t0 = chrono::high_resolution_clock::now();
-        propagation(w, p, t, sol);
+        propagation(w, p, t, sol, order);
         auto t1 = chrono::high_resolution_clock::now();
         double secs = chrono::duration<double>(t1 - t0).count();
         cerr << "Witness propagation took " << secs << " s\n";

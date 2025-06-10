@@ -3,11 +3,16 @@
 
 #include "constants.h"
 
-// Naïve boolean‐count convolution (replaceable with FFT)
-vector<int> boolCountConv(const vector<int>& a, const vector<int>& b);
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define all(x) begin(x), end(x)
+#define sz(x) (int)(x).size()
+typedef vector<int> vi;
+typedef complex<double> C;
+typedef vector<double> vd;
 
-// Naïve integer‐sum convolution
-vector<long long> intSumConv(const vector<long long>& aSum, const vector<int>& b);
+void fft(vector<C>& a);
+vd conv(const vd& a, const vd& b);
+vector<int> convolution(const vector<int>& a, const vector<int>& b);
 
 // (max, +) convolution
 vector<ll> maxPlusCnv(const vector<ll>& a, const vector<ll>& b);
