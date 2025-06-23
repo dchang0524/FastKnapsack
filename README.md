@@ -58,4 +58,4 @@ We can naturally extend the result of this paper to finding k-minimum witnesses 
 <!-- -->
 We can use this approach to find the minimum witnesses to boolean convolutions. An additional benefit is that this allows us to pick a specific lexicographical order unlike the adaptive ordering version of the algorithm.
 ## Randomized Algorithm
-Our main paper also provides a randomized alternative to Algorithm 4, which is similar to the ideas in 'Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions'.
+Our main paper also provides a randomized alternative to Algorithm 4, which is similar to the randomized approach to finding witnesses to matrix multiplication in 'Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions'.
