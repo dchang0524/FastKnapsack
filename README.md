@@ -13,7 +13,7 @@ It provides fast, practical code for three classic problems:
 - **Residue Table**  
   Given coin denominations, for each residue, find the smallest achievable sum.
 
-# Preliminatries
+# Preliminaries
 ## Definitions
 1. Let coins 1, ..., n have weights (w_1, ..., w_n) and profits (p_1, ..., p_n)
 2. A solution to a sum c is represented by a vector (m_1, ..., m_n) denoting the multiplicities of each coin such that (m_1 * w_1) + ... + (m_n * w_n) = c and the value of the solution which is (m_1 * p_1) + ... + (m_n * p_n) is maximized.
@@ -39,10 +39,23 @@ For CoinChange and Residue Table, we apply Adaptive Minimum-Witness Finding (Alg
 ## Algorithm 4: Adaptive Minimum Witness Finding
 Let us have p boolean convolutions: c_i = boolCnv(a_i, b_i) for i = [1, p]. a_i represents the boolean array of our coins, while b_i represents the boolean arrays of our results after making i convolutions during the Kernel Computation.
 We use the following two blackbox algorithms from other papers:
-1. For some c = boolCnv(a,b), for every index i where c[i] > 0, let x[i] = {witness a[j] | ai-j]^b[j] = 1}. We can compute min(|x[i]|, k) elements in x[i] in O~(k(n+m)) time.
-2. Given sets S_1, ..., S_u, where for i in 1,...,u S_i is a subset of {1, ..., n} and |S_i| >= R, we can compute a "hitting set" of size <= (n/R)*log(u) so that the hitting set contains at least one element in each S_i. This can be done in O~((n+u)R) time.
+1. For some c = boolCnv(a,b), for every index i where c[i] > 0, let x[i] = {witness a[j] | ai-j]^b[j] = 1}. We can compute min(|x[i]|, k) elements in x[i] in O~(k(n+m)) time. (Lemma 5.6)
+2. Given sets S_1, ..., S_u, where for i in 1,...,u S_i is a subset of {1, ..., n} and |S_i| >= R, we can compute a "hitting set" of size <= (n/R)*log(u) so that the hitting set contains at least one element in each S_i. This can be done in O~((n+u)R) time. (Lemma 5.7)
 With the p boolean convolutions, instead of trying to find the minimum witness of every convolution, we fix an arbitrary witness for each convolution, then find an ordering that makes the fixed witness the minimum witness.
  <!-- -->
 Let n be the length of our permutation. For our p boolean convolutions, we apply (1) to find at most k witnesses for each entry in each convolution. We choose k = 2log(p * t). If an entry has less than k convolutions, we can ignore it and compute its minimum witness among its set of witnesses after fully determining our permutation. Now, every element has k elements, so we apply (2) to find a hitting set of set of size <= (n/2log(p * t))log(p * t) = n/2. If we let the first min(n/2, |hitting set|) elements be some permutation of the hitting set, all the convolutions will have their minimum witness within the first min(n/2, |hitting set|) elements, so we can order the latter part of the permutation in any way. Now, we change the permutation we need to compute be the hitting set, reducing the size of the permutation to less than or equal to n/2. We change b_i by getting rid of the coins not in this first part of the permutation, then recompute c_i. Now, we apply this algorithm again on this new permutation, until the size of our new permutation is <= 1.
 This gives us the lexical ordering and the corresponding minimum witnesses of our convolutions under that ordering in O~(n).
 # Notes on Algorithm 4
+## Lemma 5.6: Finding k-wintesses
+The main difficulty in implementing Algorithm 4 is implementing Lemma 5.6. The paper suggests two ways to implement it: by turning it into a k-reconstruction problem as in the paper Finding Witnesses by Peeling, or by generalizing the algorithm to find witnesses in boolean matrix multiplication as in the paper Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions.
+<!-- -->
+The paper 'Finding Witnesses by Peeling' uses the algorithm in 'Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions' to solve the unbounded 1-reconstruction problem. The exact methodology is not mentioned, but I assume it is finding a witness in each subset through the use of convolutions using the methodology described in the Derandomization paper. However, this requires the use of the construction of c-wise e-independent probability spaces(as in 'Small-bias probability spaces: eﬃcient constructions and
+applications'), and we are required to iterate through the whole probability space which has size O(log^5 n). Thus, although the both implementations allow the algorithm to be near linear, it has a high overhead. Thus, it is actually faster to use an O~(n sqrt n) algorithm for most applications, which I will write below.
+## Simplified O~(n sqrt n) Algorithm
+As mentioned in the paper 'Extreme Witnesses and Their Applications', there exists an algorithm to find k-minimum witnesses to a boolean convolution in O(n sqrt n sqrt k log n) time. This is done by dividing the first array into disjoint groups of size O(sqrt(n/k)), and then computing the convolution between each group and the second array using FFT.
+<!-- -->
+We can naturally extend the result of this paper to finding k-minimum witnesses to a boolean convolution under a specific lexicographical order. We can do this by dividing the lexicographical permutation into O(sqrt n/k) sized groups that contain contiguous elements and are disjoint. Then, we replace the numbers i in each group with a[i], then compute the boolean convolution of each group with b. Then, we can proceed identically as the paper 'Extreme Witnesses and Their Applications'.
+<!-- -->
+We can use this approach to find the minimum witnesses to boolean convolutions. An additional benefit is that this allows us to pick a specific lexicographical order unlike the adaptive ordering version of the algorithm.
+## Randomized Algorithm
+Our main paper also provides a randomized alternative to Algorithm 4, which is similar to the ideas in 'Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions'.
