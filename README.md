@@ -13,7 +13,7 @@ It provides fast, practical code for three classic problems:
 - **Residue Table**  
   Given coin denominations, for each residue, find the smallest achievable sum.
 
-# Key Ideas
+# Preliminatries
 ## Definitions
 1. Let coins 1, ..., n have weights (w_1, ..., w_n) and profits (p_1, ..., p_n)
 2. A solution to a sum c is represented by a vector (m_1, ..., m_n) denoting the multiplicities of each coin such that (m_1 * w_1) + ... + (m_n * w_n) = c and the value of the solution which is (m_1 * p_1) + ... + (m_n * p_n) is maximized.
@@ -24,6 +24,8 @@ It provides fast, practical code for three classic problems:
 1. For any lexical order σ and any feasible target j, |supp(sol(j, σ))| ≤ log_2{u} + 1
 2. For any lexical order σ, a feasible target j ∈ [1, t] and a “witness” x ∈ supp(sol(j, σ)), let sol(j, σ) = (u_1, · · · , u_n). Define (v_1, · · · , v_n) as follows:
 v_k = (u_k if k != x, u_k − 1 if k = x). We have sol(j − w_x, σ) = v.
+
+# Key Algorithms
 ## Algorithm 1: Witness Propagation
 By combinatorial property 2, to compute sol(c, σ), we only need to know sol(x, σ), where x = w_{a_1} + ... + w_{a_z}, where {a_1, ..., a_z} = supp(sol(c, σ)). We call the set of values the kernel.
 Assuming we have the solutions to the kernel, we can extend our solutions to [1, ..., t] using the traditional knapsack algorithm, in push DP style (where we update future states based on the current state). The coins at each state in the DP correspond to the support of our solution.
@@ -43,3 +45,4 @@ With the p boolean convolutions, instead of trying to find the minimum witness o
  <!-- -->
 Let n be the length of our permutation. For our p boolean convolutions, we apply (1) to find at most k witnesses for each entry in each convolution. We choose k = 2log(p * t). If an entry has less than k convolutions, we can ignore it and compute its minimum witness among its set of witnesses after fully determining our permutation. Now, every element has k elements, so we apply (2) to find a hitting set of set of size <= (n/2log(p * t))log(p * t) = n/2. If we let the first min(n/2, |hitting set|) elements be some permutation of the hitting set, all the convolutions will have their minimum witness within the first min(n/2, |hitting set|) elements, so we can order the latter part of the permutation in any way. Now, we change the permutation we need to compute be the hitting set, reducing the size of the permutation to less than or equal to n/2. We change b_i by getting rid of the coins not in this first part of the permutation, then recompute c_i. Now, we apply this algorithm again on this new permutation, until the size of our new permutation is <= 1.
 This gives us the lexical ordering and the corresponding minimum witnesses of our convolutions under that ordering in O~(n).
+# Notes on Algorithm 4
