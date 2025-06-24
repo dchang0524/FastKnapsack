@@ -10,5 +10,5 @@
  * Can be easily extended to find K minimum witnesses in O(n^(1.5) * sqrt(K) * log n) time
  * Can also be easily extended to some other convolutions, like polynomial convolutions
  */
-vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, vector<int>& order);
+vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, const vector<int>& w, vector<int>& order);
 #endif

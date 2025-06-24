@@ -29,8 +29,8 @@ void kernelComputation_knapsack(
 
 void kernelComputation_coinchange_simple(
     int n, int u,
-    vector<int>& w,
-    vector<int>& p,
+    const vector<int>& w,
+    const vector<int>& p,
     vector<int>& order,
     int t,
     vector<solution>& sol
@@ -38,8 +38,8 @@ void kernelComputation_coinchange_simple(
 
 void kernelComputation_coinchange(
     int n, int u,
-    vector<int>& w,
-    vector<int>& p,
+    const vector<int>& w,
+    const vector<int>& p,
     vector<int>& order,
     int t,
     vector<solution>& sol

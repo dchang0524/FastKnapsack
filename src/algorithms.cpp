@@ -137,9 +137,10 @@ void kernelComputation_coinchange_simple(
 
     // v[c] = can reach capacity c so far
     vector<int> v(KU), f(u+1);
-    v[0] = 0;
+    v[0] = 1;
+    f[0] = 1;
     for (int i = 1; i <= n; i++) {
-        f[w[order[i]]] = p[order[i]];
+        f[w[order[i]]] = 1;
     }
 
     vector<int> inverseOrder(n+1);
@@ -150,26 +151,32 @@ void kernelComputation_coinchange_simple(
     vector<int> vPrime;
     for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
         // 1) boolean convolve to get new reachable capacities
-        vPrime = boolCnv(v, f); //has size = KU + u - 1
+        vPrime = boolCnv(v, f);
+        // cerr << "vPrime after boolCnv: " << endl;
+        // cerr << "[";
+        // for (int i = 0; i < vPrime.size(); i++) {
+        //     cerr << vPrime[i] << ", ";
+        // }
+        // cerr << "]" << endl;
 
         // 2) Find minimum witness for each reachable capacity
-        vector<int> minW = minimum_witness_boolCnv_ordered(vPrime, f, order);
-
+        vector<int> minW = minimum_witness_boolCnv_ordered(f, v, w, order);
         // 3) reconstruct each kernel solution
         for (int c = 1; c < KU; c++) {
-            if (vPrime[c] && v[c] == 0) {
+            if (vPrime[c] == 1 && v[c] == 0) {
+                // cerr << "first time reaching capacity " << c << " at " << iter << endl;
                 // accept new reachable capacity
                 v[c] = vPrime[c];
 
                 // find the minimum witness 
                 int witnessI = minW[c];
-
                 int coinIdx = inverseOrder[witnessI];
+                // cerr  << "min witness for " << c << " is " << witnessI << " with weight " << w[coinIdx] << endl;
                 int prev    = c - w[coinIdx];
                 if (prev >= 0) {
                     sol[prev].copy(sol[c]);
                 }
-                sol[c].addCoin(coinIdx, w[coinIdx], -1); //note in coinchange, the profit array is just -1
+                sol[c].addCoin(witnessI, w[coinIdx], -1); //note in coinchange, the profit array is just -1
             }
         }
     }

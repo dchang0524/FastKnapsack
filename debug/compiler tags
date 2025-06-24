@@ -1,0 +1,9 @@
+g++-14 -std=c++20 -O2 \
+  -I../include \
+  ../src/algorithms.cpp \
+  ../src/dp_structs.cpp \
+  ../src/convolution.cpp \
+  ../src/witness.cpp \
+  ../src/hitting_set.cpp \
+  my_debug.cpp \
+  -o my_debug
