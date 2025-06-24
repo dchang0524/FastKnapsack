@@ -1,6 +1,6 @@
 # FastKnapsack
 
-This repository implements the near-linear algorithms from  
+This repository implements the near-linear algorithms to subset sum problems from  
 **“On Problems Related to Unbounded SubsetSum: A Unified Combinatorial Approach”**  
 (Chan, Deng, Mao, Zhong; arXiv:2202.13484) in C++.
 
@@ -25,7 +25,7 @@ It provides fast, practical code for three classic problems:
 2. For any lexical order σ, a feasible target j ∈ [1, t] and a “witness” x ∈ supp(sol(j, σ)), let sol(j, σ) = (u_1, · · · , u_n). Define (v_1, · · · , v_n) as follows:
 v_k = (u_k if k != x, u_k − 1 if k = x). We have sol(j − w_x, σ) = v.
 
-# Key Algorithms
+# Key Algorithms from the Paper
 ## Algorithm 1: Witness Propagation
 By combinatorial property 2, to compute sol(c, σ), we only need to know sol(x, σ), where x = w_{a_1} + ... + w_{a_z}, where {a_1, ..., a_z} = supp(sol(c, σ)). We call the set of values the kernel.
 Assuming we have the solutions to the kernel, we can extend our solutions to [1, ..., t] using the traditional knapsack algorithm, in push DP style (where we update future states based on the current state). The coins at each state in the DP correspond to the support of our solution.
@@ -64,4 +64,14 @@ We can naturally extend the result of this paper to finding k-minimum witnesses 
 <!-- -->
 We can use this approach to find the minimum witnesses to boolean convolutions. An additional benefit is that this allows us to pick a specific lexicographical order unlike the adaptive/randomized version of the algorithm.
 
-# Experimentation: Competitive Programming
+# Benchmark Results
+# Papers Referenced
+Minyang Deng, Xiao Mao, Ziqian Zhong. On Problems Related to Unbounded SubsetSum: A Unified Combinatorial Approach. https://arxiv.org/abs/2202.13484
+N. Alon and M. Naor. Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions. Algorithmica, 16(4-5):434–449, 1996. doi:10.1007/s004539900059.
+N. Alon, O. Goldreich, J. Hastad and R. Peralta , Simple constructions of almost k-wise
+independent random variables, Proc. 31st IEEE Symposium on Foundations of Computer
+Science (1990), 544–553. Also: Random Structures and Algorithms 3 (1992), 289-304.
+J. Naor and M. Naor, Small-bias probability spaces: efficient constructions and applications, SIAM J. on Computing 22, 1993, pp. 838–856.
+Yonatan Aumann, Moshe Lewenstein, Noa Lewenstein, and Dekel Tsur. Finding witnesses by peeling. ACM Trans. Algorithms, 7(2):Art. 24, 15, 2011. doi:10.1145/1921659.1921670.
+Andrzej Lingas and Mia Persson. Extreme witnesses and their applications. Algorithmica, 80(12):3943–3957, 2018. doi:10.1007/s00453-018-0492-8.
+D. Aingworth, C. Chekuri, and R. Motwani. Fast estimation of diameter and shortest paths (without matrix multiplication). In Proceedings of the Seventh Annual ACMSIAM Symposium on Discrete Algorithms (Atlanta, GA, 1996), pages 547–553. ACM, New York, 1996.
