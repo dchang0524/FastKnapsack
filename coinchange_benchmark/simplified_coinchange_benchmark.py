@@ -14,9 +14,9 @@ SOLVER  = os.path.join(SCRIPT, 'coinchange_simplified_solver')
 # --------------------------------------------------
 
 # Benchmark parameters
-n, u    = 10000, 10000
+n, u    = 20000, 20000
 Ts      = [2**i for i in range(10, 25)]
-TRIALS  = 3
+TRIALS  = 1
 
 def compile_solvers():
     # traditional DP

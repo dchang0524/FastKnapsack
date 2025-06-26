@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import subprocess
-import time
-import random
 import os
+import subprocess
+import random
+import time
 import matplotlib.pyplot as plt
 
 BASE_DIR   = os.path.dirname(os.path.realpath(__file__))
@@ -12,14 +12,14 @@ NAIVE_EXE  = os.path.join(BASE_DIR, 'naive_witness_test')
 LOG_FILE   = os.path.join(BASE_DIR, 'witness_mismatches.log')
 
 # Sizes to test and trial count
-SIZES  = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536]
+SIZES  = [256, 512, 1024, 2048, 4096, 8192, 16384]
 TRIALS = 3
 
 opt_times   = []
 naive_times = []
 
 def compile_tests():
-    # optimized needs witness.cpp + convolution.cpp
+    # Optimized: needs witness.cpp + convolution.cpp
     subprocess.run([
         'g++-14','-std=c++20','-O2',
         '-I', INCLUDE,
@@ -28,118 +28,89 @@ def compile_tests():
         os.path.join('..','src','convolution.cpp'),
         '-o', OPT_EXE
     ], cwd=BASE_DIR, check=True)
-    # naive reference
+
+    # Naive reference
     subprocess.run([
         'g++-14','-std=c++20','-O2',
-        '-I', INCLUDE,
         'naive_witness_test.cpp',
         '-o', NAIVE_EXE
     ], cwd=BASE_DIR, check=True)
 
 def run_benchmark():
-    # init log
+    # Prepare log
     with open(LOG_FILE, 'w') as log:
-        log.write('Witness Mismatch Log\n')
-        log.write('====================\n\n')
+        log.write("Witness Mismatch Log\n")
+        log.write("====================\n\n")
 
-    print('n    | Optimized(s) | Naive(s) | Match?')
-    print('-----+--------------+----------+-------')
+    print(' n     | Optimized(s) | Naive(s) | Match?')
+    print('-------+--------------+----------+-------')
 
     for n in SIZES:
-        # generate data; a[0]=0 placeholder, order[0]=0 placeholder
-        a     = [0] + [random.randint(0,1) for _ in range(n-1)]
+        # Generate random vectors
+        a     = [random.randint(0,1) for _ in range(n)]
         b     = [random.randint(0,1) for _ in range(n)]
-        order = [0] + random.sample(range(1, n), n-1)
+        # Use identity weights so w[i]=i
+        w     = list(range(n))
+        order = random.sample(range(n), n)
 
-        # build input
-        inp  = f"{n}\n"
-        inp += ' '.join(map(str, a)) + "\n"
-        inp += ' '.join(map(str, b)) + "\n"
+        # Build the input block
+        inp = f"{n}\n"
+        inp += ' '.join(map(str, a))     + "\n"
+        inp += ' '.join(map(str, b))     + "\n"
+        inp += ' '.join(map(str, w))     + "\n"
         inp += ' '.join(map(str, order)) + "\n"
 
-        # run optimized and naive once for correctness
-        proc_opt   = subprocess.run([OPT_EXE],   input=inp, text=True, capture_output=True)
-        proc_naive = subprocess.run([NAIVE_EXE], input=inp, text=True, capture_output=True)
+        # Run optimized once for time+output
+        tote = 0.0
+        out_opt = None
+        for _ in range(TRIALS):
+            t0 = time.perf_counter()
+            proc = subprocess.run([OPT_EXE],
+                                  input=inp, text=True,
+                                  capture_output=True, check=True)
+            tote += time.perf_counter() - t0
+            out_opt = list(map(int, proc.stdout.split()))
+        opt_time = tote / TRIALS
 
-        out_opt   = list(map(int, proc_opt.stdout.strip().split()))
-        out_naive = list(map(int, proc_naive.stdout.strip().split()))
-        match     = (out_opt == out_naive)
+        # Run naive once for time+output
+        totn = 0.0
+        out_naive = None
+        for _ in range(TRIALS):
+            t0 = time.perf_counter()
+            proc = subprocess.run([NAIVE_EXE],
+                                  input=inp, text=True,
+                                  capture_output=True, check=True)
+            totn += time.perf_counter() - t0
+            out_naive = list(map(int, proc.stdout.split()))
+        naive_time = totn / TRIALS
 
-        if not match:
-            # compute true boolean convolution result c
-            R = n + n - 1
-            c_list = []
-            for k in range(R):
-                val = 0
-                for j in range(max(0, k-(n-1)), min(n, k+1)):
-                    if a[j] and b[k-j]:
-                        val = 1
-                        break
-                c_list.append(val)
+        ok = out_opt == out_naive
+        print(f"{n:<7}| {opt_time:12.6f} | {naive_time:8.6f} | {'Y' if ok else 'N'}")
 
-            # log mismatch details
+        # Log mismatches in detail
+        if not ok:
             with open(LOG_FILE, 'a') as log:
-                log.write(f'n = {n} mismatch detected\n')
+                log.write(f'\nn = {n} mismatch\n')
+                log.write(f'a     = {a}\n')
+                log.write(f'b     = {b}\n')
+                log.write(f'w     = {w}\n')
+                log.write(f'order = {order}\n')
+                log.write('idx : opt vs naive\n')
                 for idx, (xo, xn) in enumerate(zip(out_opt, out_naive)):
                     if xo != xn:
-                        # convert lex-rank back to original index
-                        opt_idx   = xo
-                        naive_idx = xn
-                        # values from a and b used in convolution
-                        opt_b_idx   = idx - opt_idx
-                        naive_b_idx = idx - naive_idx
+                        log.write(f'  {idx}: {xo} vs {xn}\n')
+                log.write('\n')
 
-                        if 0 <= opt_b_idx < len(b):
-                            b_opt_val = b[opt_b_idx]
-                        else:
-                            b_opt_val = '<invalid>'
-
-                        if 0 <= naive_b_idx < len(b):
-                            b_naive_val = b[naive_b_idx]
-                        else:
-                            b_naive_val = '<invalid>'
-                        log.write(
-                            f'  idx={idx}: c={c_list[idx]}\n'
-                            f'    optimized chose a[{opt_idx}]={a[opt_idx]}, '
-                            f'b[{opt_b_idx}]={b_opt_val}\n'
-                            f'    naive     chose a[{naive_idx}]={a[naive_idx]}, '
-                            f'b[{naive_b_idx}]={b_naive_val}\n\n'
-                        )
-                        break
-                log.write(f'Full c array           = {c_list}\n')
-                log.write(f'Optimized witnesses    = {out_opt}\n')
-                log.write(f'Naive witnesses        = {out_naive}\n')
-                log.write(f'a vector               = {a}\n')
-                log.write(f'b vector               = {b}\n')
-                log.write(f'order permutation      = {order}\n\n')
-
-        # benchmark optimized (wall-clock)
-        t_opt = 0.0
-        for _ in range(TRIALS):
-            start = time.perf_counter()
-            subprocess.run([OPT_EXE], input=inp, text=True, capture_output=True, check=True)
-            t_opt += time.perf_counter() - start
-        t_opt /= TRIALS
-        opt_times.append(t_opt)
-
-        # benchmark naive (wall-clock)
-        t_naive = 0.0
-        for _ in range(TRIALS):
-            start = time.perf_counter()
-            subprocess.run([NAIVE_EXE], input=inp, text=True, capture_output=True, check=True)
-            t_naive += time.perf_counter() - start
-        t_naive /= TRIALS
-        naive_times.append(t_naive)
-
-        print(f"{n:<5}| {t_opt:12.6f} | {t_naive:8.6f} | {'Y' if match else 'N'}")
+        opt_times.append(opt_time)
+        naive_times.append(naive_time)
 
     print(f"\nDetails logged to {LOG_FILE}")
 
-    # plot results
+    # Plot
     plt.figure()
-    plt.plot(SIZES, opt_times, marker='o')
+    plt.plot(SIZES, opt_times,   marker='o')
     plt.plot(SIZES, naive_times, marker='o')
-    plt.xlabel('n')
+    plt.xlabel('n (vector size)')
     plt.ylabel('Time (s)')
     plt.legend(['Optimized','Naive'])
     plt.title('Minimum-Witness Boolean Convolution Benchmark')

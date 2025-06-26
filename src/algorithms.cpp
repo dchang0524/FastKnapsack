@@ -54,7 +54,6 @@ void kernelComputation_knapsack(
     vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
 ) {
     int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
-    // cout << "kernel size " << k << endl; 
     int KU = k * u + 1;
 
     // prepare sol[0..KU-1]
@@ -66,7 +65,6 @@ void kernelComputation_knapsack(
     for (int i = 1; i <= n; i++) {
         f[w[order[i]]] = p[order[i]];
     }
-    // cout << "v, f initialized" << endl;
 
     //For min-witness tracking
     vector<ll> f_w(u+1, NEG_INF);
@@ -152,12 +150,6 @@ void kernelComputation_coinchange_simple(
     for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
         // 1) boolean convolve to get new reachable capacities
         vPrime = boolCnv(v, f);
-        // cerr << "vPrime after boolCnv: " << endl;
-        // cerr << "[";
-        // for (int i = 0; i < vPrime.size(); i++) {
-        //     cerr << vPrime[i] << ", ";
-        // }
-        // cerr << "]" << endl;
 
         // 2) Find minimum witness for each reachable capacity
         vector<int> minW = minimum_witness_boolCnv_ordered(f, v, w, order);
@@ -171,7 +163,6 @@ void kernelComputation_coinchange_simple(
                 // find the minimum witness 
                 int witnessI = minW[c];
                 int coinIdx = inverseOrder[witnessI];
-                // cerr  << "min witness for " << c << " is " << witnessI << " with weight " << w[coinIdx] << endl;
                 int prev    = c - w[coinIdx];
                 if (prev >= 0) {
                     sol[prev].copy(sol[c]);
