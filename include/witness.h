@@ -11,4 +11,9 @@
  * Can also be easily extended to some other convolutions, like polynomial convolutions
  */
 vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, const vector<int>& w, vector<int>& order);
+
+/**
+ * Uniformly samples a witness for each result element, in expected O(n log^2 n) time
+ */
+vector<int> randomized_witness_sampling(vector<int>& a, vector<int>& b);
 #endif

@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 BASE_DIR   = os.path.dirname(os.path.realpath(__file__))
 INCLUDE    = os.path.join(BASE_DIR, '..', 'include')
-OPT_EXE    = os.path.join(BASE_DIR, 'optimized_witness_test')
-NAIVE_EXE  = os.path.join(BASE_DIR, 'naive_witness_test')
+OPT_EXE    = os.path.join(BASE_DIR, 'optimized_min_witness_test')
+NAIVE_EXE  = os.path.join(BASE_DIR, 'naive_min_witness_test')
 LOG_FILE   = os.path.join(BASE_DIR, 'witness_mismatches.log')
 
 # Sizes to test and trial count
@@ -23,7 +23,7 @@ def compile_tests():
     subprocess.run([
         'g++-14','-std=c++20','-O2',
         '-I', INCLUDE,
-        'optimized_witness_test.cpp',
+        'optimized_min_witness_test.cpp',
         os.path.join('..','src','witness.cpp'),
         os.path.join('..','src','convolution.cpp'),
         '-o', OPT_EXE
@@ -32,7 +32,7 @@ def compile_tests():
     # Naive reference
     subprocess.run([
         'g++-14','-std=c++20','-O2',
-        'naive_witness_test.cpp',
+        'naive_min_witness_test.cpp',
         '-o', NAIVE_EXE
     ], cwd=BASE_DIR, check=True)
 

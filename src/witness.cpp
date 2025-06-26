@@ -5,25 +5,6 @@
  */
 vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, const vector<int>& w, vector<int>& order) {
     //create sqrt(n) vectors depending on what division of sqrt(n) the index is in
-    //print a, b, w, order
-    // std::cerr << "a: ";
-    // for (int i = 0; i < a.size(); i++) {
-    //     std::cerr << a[i] << " ";
-    // }
-    // std::cerr << "\nb: ";
-    // for (int i = 0; i < b.size(); i++) {
-    //     std::cerr << b[i] << " ";
-    // }
-    // std::cerr << "\nw: ";
-    // for (int i = 0; i < w.size(); i++) {
-    //     std::cerr << w[i] << " ";
-    // }
-    // std::cerr << "\norder: ";
-    // for (int i = 0; i < order.size(); i++) {
-    //     std::cerr << order[i] << " ";
-    // }
-    // cerr << endl;
-
     int n = order.size();
     int sqrt_n = (int)ceil(sqrt(n));
     vector<vector<int>> a_P(sqrt_n + 1, vector<int>(a.size())); //division of a into O(sqrt(n)) parts
@@ -35,14 +16,6 @@ vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, cons
         a_P[i / sqrt_n][w[order[i]]] = 1;
         id[i/sqrt_n].push_back(order[i]);
     }
-
-    // for (int g  = 0; g < a_P.size(); g++) {
-    //     std::cerr << "a_P[" << g << "]: ";
-    //     for (int i = 0; i < a_P[g].size(); i++) {
-    //         std::cerr << a_P[g][i] << " ";
-    //     }
-    //     std::cerr << endl;
-    // }
 
     vector<vector<int>> groups(a_P.size()); //group[i] contains the result elements that have their minimum witness in group i
 
@@ -56,15 +29,6 @@ vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, cons
             }
         }
     }
-
-    // //print groups
-    // for (int g = 0; g < groups.size(); g++) {
-    //     std::cerr << "groups[" << g << "]: ";
-    //     for (int i = 0; i < groups[g].size(); i++) {
-    //         std::cerr << groups[g][i] << " ";
-    //     }
-    //     std::cerr << endl;
-    // }
 
     vector<int> min_witness(n + b.size() - 1, -1);
     vector<int> inverseOrder(order.size());
@@ -82,13 +46,82 @@ vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, cons
                 }
             }
         }
-    }
-    //print the minimum witnesses
-    // std::cerr << "Minimum witnesses: ";
-    // for (int i = 0; i < min_witness.size(); i++) {
-    //     std::cerr << min_witness[i] << " ";
-    // }
-    // std::cerr << endl;
-    
+    }    
     return min_witness;
+}
+
+/**
+ * Uniformly samples a witness for each result element, in expected O(n log^2 n) time
+ */
+vector<int> randomized_witness_sampling(vector<int>& a, vector<int>& b) {
+    // cerr << "Randomized witness sampling started" << endl;
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    mt19937 rng(seed);
+    bernoulli_distribution coin(0.5);
+    
+    vector<int> c = convolution(a, b);
+
+    vector<int> aVal(a.size(), 0);
+    for (int i = 0; i < a.size(); ++i) {
+        if (a[i] > 0) {
+            aVal[i] = i;
+        }
+    }
+    vector<int> cVal;
+    cVal = convolution(aVal, b);
+    vector<int> witness(c.size(), -1);
+    int need = 0;
+    int cnt = 0;
+
+    for (int i = 0; i < sz(c); ++i) {
+        if (c[i] > 0) {
+            need++;
+            if (c[i] == 1) {
+                witness[i] = cVal[i];
+                cnt++;
+            }
+        }
+    }
+
+    // for (int i = 0; i < sz(c); ++i) {
+    //         cerr << c[i] << " ";
+    // }
+    // cerr << endl;
+    // cerr << "Need: " << need << ", cnt: " << cnt << endl;
+    
+    while (cnt < need) {
+        int K = (int)ceil(log2(sz(a)));
+        vector<int> aDiluted(a.size(), 0);
+        rep(i, 0, sz(a)) {
+            aDiluted[i] = a[i];
+        }
+        for (int k = 0; k < K; ++k) {
+            rep(i, 0, sz(aDiluted)) {
+                int bit = coin(rng) ? 1 : 0;
+                aDiluted[i] = aDiluted[i] & bit;          
+            }
+            rep(i, 0, sz(aDiluted)) {
+                if (aDiluted[i] > 0) {
+                    aVal[i] = i;
+                } else {
+                    aVal[i] = 0;
+                }
+            }
+            c = convolution(aDiluted, b);
+            cVal = convolution(aVal, b);
+            rep(i, 0, sz(c)) {
+                if (c[i] == 1 && witness[i] == -1) {
+                    witness[i] = cVal[i];
+                    cnt++;
+                }
+            }
+        }
+
+        // for (int i = 0; i < sz(aDiluted); ++i) {
+        //     cerr << aDiluted[i] << " ";
+        // }
+        // cerr << endl;
+        // cerr << "Need: " << need << ", cnt: " << cnt << endl;
+    }
+    return witness;
 }
