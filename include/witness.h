@@ -16,4 +16,9 @@ vector<int> minimum_witness_boolCnv_ordered(vector<int>& a, vector<int>& b, cons
  * Uniformly samples a witness for each result element, in expected O(n log^2 n) time
  */
 vector<int> randomized_witness_sampling(vector<int>& a, vector<int>& b);
+
+/**
+ * Finds the minimum witness with respect to a random order in expected O~(n) time.
+ */
+vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, vector<int>& w, vector<int>& order);
 #endif

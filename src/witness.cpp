@@ -125,3 +125,79 @@ vector<int> randomized_witness_sampling(vector<int>& a, vector<int>& b) {
     }
     return witness;
 }
+
+/**
+ * Finds the minimum witness with respect to a random order in expected O~(n) time.
+*/
+vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, vector<int>& w, vector<int>& order) {
+    unordered_map<int, int> ind; //converts weight to order index
+    for (int i = 1; i < sz(order); ++i) {
+        ind[w[order[i]]] = i;
+    }
+
+    // for (auto mp : ind) {
+    //     cerr << mp.first << " -> " << mp.second << endl;
+    // }
+
+    vector<unordered_set<int>> witSets(sz(a) + sz(b) - 1);
+    vector<int> min_witness(sz(a) + sz(b) - 1, -1);
+    vector<int> found(sz(a) + sz(b) - 1, 0);
+    int l = 1;
+    vector<int> aPref(sz(a), 0);
+    while (l <= sz(order)-1) {
+        // cerr << "Current l: " << l << endl;
+
+        for (int i = 1; i <= l; ++i) {
+            aPref[w[order[i]]] = 1;
+        }
+        // cerr << "aPref: " << endl;
+        // for (int i = 0; i < sz(aPref); ++i) {
+        //     cerr << aPref[i] << " ";
+        // }
+        // cerr << endl;
+        vector<int> c = convolution(aPref, b);
+        // cerr << "c: " << endl;
+        // for (int i = 0; i < sz(c); ++i) {
+        //     cerr << c[i] << " ";
+        // }
+        // cerr << endl;
+        int need = 0;
+        for (int i = 0; i < sz(c); ++i) {
+            if (c[i] > 0 && found[i] == 0) {
+                need++;
+            }
+        }
+        int cnt = 0;
+        while (cnt < need) {
+            vector<int> sample = randomized_witness_sampling(aPref, b);
+            // cerr << "Sample: " << endl;
+            // for (int i = 0; i < sz(sample); ++i) {
+            //     cerr << sample[i] << " ";
+            // }
+            // cerr << endl;
+            for (int i = 0; i < sz(sample); ++i) {
+                if (sample[i] != -1 && found[i] == 0) {
+                    // cerr << "Found witness for " << i << ": " << ind[sample[i]] << endl;
+                    witSets[i].insert(ind[sample[i]]);
+                    if (witSets[i].size() == c[i]) {
+                        found[i] = 1;
+                        min_witness[i] = *witSets[i].begin();
+                        cnt++;
+                    }
+                }
+            }
+        }
+        // for (int i = 0; i < sz(c); ++i) {
+        //     cerr << "witnees for " << i << ": ";
+        //     for (int i : witSets[i]) {
+        //         cerr << i << " ";
+        //     }
+        //     cerr << endl;
+        // }
+        if (l == sz(order) - 1) {
+            break;
+        }
+        l = min(sz(order) - 1, l * 2);
+    }
+    return min_witness;
+}
