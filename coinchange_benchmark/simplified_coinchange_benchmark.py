@@ -14,7 +14,7 @@ SOLVER  = os.path.join(SCRIPT, 'coinchange_simplified_solver')
 # --------------------------------------------------
 
 # Benchmark parameters
-n, u    = 20000, 20000
+n, u    = 10000, 10000
 Ts      = [2**i for i in range(10, 25)]
 TRIALS  = 1
 

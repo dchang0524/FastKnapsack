@@ -1,0 +1,51 @@
+coinchange_ops_benchmark
+
+
+u=1000, n=1000
+Kernel time:            0.529773 s
+Count of O(1) blocks:   21351133
+Count of O(N·√N) blocks:680
+Estimated total ops (ignore consts): 2.3565e+08
+
+
+u=2000, n=2000
+Kernel time:            1.7437 s
+Count of O(1) blocks:   71155777
+Count of O(N·√N) blocks:1034
+Estimated total ops (ignore consts): 1.08531e+09
+
+
+u=5000, n=5000
+Kernel time:            7.09673 s
+Count of O(1) blocks:   355195553
+Count of O(N·√N) blocks:1825
+Estimated total ops (ignore consts): 8.28366e+09
+
+
+u=10000, n=10000
+Kernel time:            46.9801 s
+Count of O(1) blocks:   1166385293
+Count of O(N·√N) blocks:2781
+Estimated total ops (ignore consts): 3.81195e+10
+
+
+u=20000, n=20000
+Kernel time:            155.362 s
+Count of O(1) blocks:   3754451453
+Count of O(N·√N) blocks:4176
+Estimated total ops (ignore consts): 1.72514e+11
+
+
+u=40000, n=40000
+Kernel time:            535.094 s
+Count of O(1) blocks:   12073089255
+Count of O(N·√N) blocks:6293
+Estimated total ops (ignore consts): 7.81718e+11
+
+
+u=80000, n=80000
+Kernel time:            1773.84 s
+Count of O(1) blocks:   38349901566
+Count of O(N·√N) blocks:9405
+Estimated total ops (ignore consts): 3.50455e+12
+

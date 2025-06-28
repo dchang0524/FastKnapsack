@@ -5,33 +5,36 @@ import random
 import time
 import matplotlib.pyplot as plt
 
-BASE_DIR   = os.path.dirname(os.path.realpath(__file__))
-INCLUDE    = os.path.join(BASE_DIR, '..', 'include')
-OPT_EXE    = os.path.join(BASE_DIR, 'optimized_min_witness_test')
-NAIVE_EXE  = os.path.join(BASE_DIR, 'naive_min_witness_test')
-LOG_FILE   = os.path.join(BASE_DIR, 'witness_mismatches.log')
+BASE_DIR    = os.path.dirname(os.path.realpath(__file__))
+INCLUDE     = os.path.join(BASE_DIR, '..', 'include')
+OPT_EXE     = os.path.join(BASE_DIR, 'optimized_min_witness_test')
+NAIVE_EXE   = os.path.join(BASE_DIR, 'naive_min_witness_test')
+LOG_FILE    = os.path.join(BASE_DIR, 'witness_mismatches.log')
 
 # Sizes to test and trial count
-SIZES  = [256, 512, 1024, 2048, 4096, 8192, 16384]
-TRIALS = 3
+SIZES       = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576]
+TRIALS      = 3
 
-opt_times   = []
-naive_times = []
+# Threshold above which we skip naive validation
+MAX_VALIDATE = 10**5
+
+opt_times    = []
+naive_times  = []
 
 def compile_tests():
     # Optimized: needs witness.cpp + convolution.cpp
     subprocess.run([
-        'g++-14','-std=c++20','-O2',
+        'g++-14', '-std=c++20', '-O2',
         '-I', INCLUDE,
         'optimized_min_witness_test.cpp',
-        os.path.join('..','src','witness.cpp'),
-        os.path.join('..','src','convolution.cpp'),
+        os.path.join('..', 'src', 'witness.cpp'),
+        os.path.join('..', 'src', 'convolution.cpp'),
         '-o', OPT_EXE
     ], cwd=BASE_DIR, check=True)
 
     # Naive reference
     subprocess.run([
-        'g++-14','-std=c++20','-O2',
+        'g++-14', '-std=c++20', '-O2',
         'naive_min_witness_test.cpp',
         '-o', NAIVE_EXE
     ], cwd=BASE_DIR, check=True)
@@ -54,14 +57,14 @@ def run_benchmark():
         order = random.sample(range(n), n)
 
         # Build the input block
-        inp = f"{n}\n"
-        inp += ' '.join(map(str, a))     + "\n"
-        inp += ' '.join(map(str, b))     + "\n"
-        inp += ' '.join(map(str, w))     + "\n"
-        inp += ' '.join(map(str, order)) + "\n"
+        inp = f"{n}\n" + \
+              ' '.join(map(str, a)) + "\n" + \
+              ' '.join(map(str, b)) + "\n" + \
+              ' '.join(map(str, w)) + "\n" + \
+              ' '.join(map(str, order)) + "\n"
 
         # Run optimized once for time+output
-        tote = 0.0
+        tote    = 0.0
         out_opt = None
         for _ in range(TRIALS):
             t0 = time.perf_counter()
@@ -72,8 +75,14 @@ def run_benchmark():
             out_opt = list(map(int, proc.stdout.split()))
         opt_time = tote / TRIALS
 
-        # Run naive once for time+output
-        totn = 0.0
+        # If n exceeds our validation threshold, skip the naive runs
+        if n > MAX_VALIDATE:
+            print(f"{n:<7}| {opt_time:12.6f} | {'   SKIP   '} | SKIPPED")
+            opt_times.append(opt_time)
+            continue
+
+        # Otherwise, run the naive reference for comparison
+        totn      = 0.0
         out_naive = None
         for _ in range(TRIALS):
             t0 = time.perf_counter()
@@ -84,7 +93,7 @@ def run_benchmark():
             out_naive = list(map(int, proc.stdout.split()))
         naive_time = totn / TRIALS
 
-        ok = out_opt == out_naive
+        ok = (out_opt == out_naive)
         print(f"{n:<7}| {opt_time:12.6f} | {naive_time:8.6f} | {'Y' if ok else 'N'}")
 
         # Log mismatches in detail
@@ -106,13 +115,15 @@ def run_benchmark():
 
     print(f"\nDetails logged to {LOG_FILE}")
 
-    # Plot
+    # Plot results
+    validated_sizes = [n for n in SIZES if n <= MAX_VALIDATE]
+
     plt.figure()
     plt.plot(SIZES, opt_times,   marker='o')
-    plt.plot(SIZES, naive_times, marker='o')
+    plt.plot(validated_sizes, naive_times, marker='o')
     plt.xlabel('n (vector size)')
     plt.ylabel('Time (s)')
-    plt.legend(['Optimized','Naive'])
+    plt.legend(['Optimized', 'Naive'])
     plt.title('Minimum-Witness Boolean Convolution Benchmark')
     plt.tight_layout()
     plt.show()

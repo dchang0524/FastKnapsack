@@ -1,0 +1,56 @@
+coinchange_ops_benchmark
+
+
+u=1000, n=1000
+Kernel time:            0.521857 s
+Propagation time:       2.1e-05 s
+Total time:             0.521878 s
+Count of O(1) blocks:   -9223372036833423675
+Count of O(N·√N) blocks:680
+Estimated total ops (ignore consts): -9.22337e+18
+
+
+u=2000, n=2000
+Kernel time:            1.85886 s
+Propagation time:       7.3e-05 s
+Total time:             1.85894 s
+Count of O(1) blocks:   -9223372036783618031
+Count of O(N·√N) blocks:1034
+Estimated total ops (ignore consts): -9.22337e+18
+
+
+u=5000, n=5000
+Kernel time:            6.94106 s
+Propagation time:       9.8e-05 s
+Total time:             6.94116 s
+Count of O(1) blocks:   -9223372036499575255
+Count of O(N·√N) blocks:1825
+Estimated total ops (ignore consts): -9.22337e+18
+
+
+u=10000, n=10000
+Kernel time:            47.2863 s
+Propagation time:       0.000678 s
+Total time:             47.287 s
+Count of O(1) blocks:   -9223372035688380515
+Count of O(N·√N) blocks:2781
+Estimated total ops (ignore consts): -9.22337e+18
+
+
+u=20000, n=20000
+Kernel time:            150.529 s
+Propagation time:       0.002785 s
+Total time:             150.531 s
+Count of O(1) blocks:   -9223372033100304355
+Count of O(N·√N) blocks:4176
+Estimated total ops (ignore consts): -9.22337e+18
+
+
+u=40000, n=40000
+Kernel time:            502.666 s
+Propagation time:       0.002076 s
+Total time:             502.668 s
+Count of O(1) blocks:   -9223372024781646553
+Count of O(N·√N) blocks:6293
+Estimated total ops (ignore consts): -9.22337e+18
+

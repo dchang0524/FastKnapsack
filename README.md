@@ -56,26 +56,37 @@ applications'), and we are required to iterate through the whole probability spa
 ## Randomized Algorithm (Algorithm 3)
 The main paper also provides a randomized alternative to Algorithm 4.
 <!-- -->
-First, consider the following lemma: in exepcted O~(n+m) time, we can uniformly sample a witness for each result element of the boolean convolution of two arrays (Lemma 5.4). In fact, it can be done in expected O((n+m)log^2 (n+m)) time. First, start with the array a and b, and their boolean convolution c. Let c' be the polynomial convolution of a' and b, where a'[i] = i if a[i] = 1. Let r the polynomial convolution of a and b. Note if r[i] = 1, then c'[i] is a witness to the result element in i. How the algorithm works is that we gradually dilute the array a by turning each element to 0 with probability 1/2. Then, in expected O(log n) steps, the entries in r[i] will change to 0, ideally becoming 1 before becoming 0. If there are some elements which didn't become a 1 before 0, we run the algorithm again. In expected O(log n) iterations of this algorithm, all result elements will have found a witness. This witness is uniformly sampled as all entries can become diluted with equal probabilty. 
+First, consider the following lemma: in exepcted O~(n+m) time, we can uniformly sample a witness for each result element of the boolean convolution of two arrays (Lemma 5.4). In fact, it can be done in expected O(n log^2 n) time. First, start with the array a and b, and their boolean convolution c. Let c' be the polynomial convolution of a' and b, where a'[i] = i if a[i] = 1. Let r the polynomial convolution of a and b. Note if r[i] = 1, then c'[i] is a witness to the result element in i. How the algorithm works is that we gradually dilute the array a by turning each element to 0 with probability 1/2. Then, in expected O(log n) steps, the entries in r[i] will change to 0, ideally becoming 1 before becoming 0. If there are some elements which didn't become a 1 before 0, we run the algorithm again. In expected O(log n) iterations of this algorithm, all result elements will have found a witness. This witness is uniformly sampled as all entries can become diluted with equal probabilty. 
 <!-- -->
 Now, we look at algorithm 3. First, iterating incrementally for each prefix of size power of 2 of the lexicrographical order, we compute the minimum witnesses of nonzero result elements of the convolution of the prefix and b. We repeat until all such result elements have their minimum witnesses computed by finding all their witnesses in the current prefix using Lemma 5.4. The reason why we use a random permutation for the lexicrographical order is that this allows us to assume that a uniform amount distribution indexes exist in each prefix.
-## Simplified O~(n sqrt n) Algorithm
-As mentioned in the paper 'Extreme Witnesses and Their Applications', there exists an algorithm to find k-minimum witnesses to a boolean convolution in O(n sqrt n sqrt k log n) time. This is done by dividing the first array into disjoint groups of size O(sqrt(n/k)), and then computing the convolution between each group and the second array using FFT.
+<!-- -->
+The expected number of samplings is O(log^2 u) according to the paper, so algorithm 3 runs in expected O(u log^5 u), meaning coinchange can be solved in expected O(u log^6 u + t log u log log u).
+## Simplified O(u sqrt n log^3) Kernel Computation **New**
+As mentioned in the paper 'Extreme Witnesses and Their Applications', there exists an algorithm to find k-minimum witnesses to a boolean convolution of length n in O(n sqrt n sqrt k log n) time. This is done by dividing the first array into disjoint groups of size O(sqrt(n/k)), and then computing the convolution between each group and the second array using FFT.
 <!-- -->
 We can naturally extend the result of this paper to finding k-minimum witnesses to a boolean convolution under a specific lexicographical order. We can do this by dividing the lexicographical permutation into O(sqrt n/k) sized groups that contain contiguous elements and are disjoint. Then, we replace the numbers i in each group with a[i], then compute the boolean convolution of each group with b. Then, we can proceed identically as the paper 'Extreme Witnesses and Their Applications'.
 <!-- -->
 We can use this approach to find the minimum witnesses to boolean convolutions. An additional benefit is that this allows us to pick a specific lexicographical order unlike the adaptive/randomized version of the algorithm.
 <!-- -->
-The simplified coinchange algorithm runs in O(u sqrt u log^3 u + t log u log log u).
+The simplified coinchange algorithm runs in O(u sqrt n log^3 u + t log u log log u).
+## Randomized K-Witness **New**
+Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4. The k-witnesses can be found in expected O(n k log^2 n) time by keeping a witness set for each result element and checking after every dilution. (I'm actually not sure about this result. The expected time is no worse than O(n k^2 log^2 n), and likely better, but I didn't do the analysis on this. If the expected time is O(n k^2 log^2 n), the overall expected time complexity would be same as the randomized approach mentioned in the paper).
+<!-- -->
+Then algorithm 4 runs in expected O(u log^4 u), meaning coin change can be solved in expected O(u log^5 u + t log u log log u) time.
 
 # Benchmark Results
 # Papers Referenced
 Minyang Deng, Xiao Mao, Ziqian Zhong. On Problems Related to Unbounded SubsetSum: A Unified Combinatorial Approach. https://arxiv.org/abs/2202.13484
+<!-- -->
 N. Alon and M. Naor. Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions. Algorithmica, 16(4-5):434–449, 1996. doi:10.1007/s004539900059.
+<!-- -->
 N. Alon, O. Goldreich, J. Hastad and R. Peralta , Simple constructions of almost k-wise
 independent random variables, Proc. 31st IEEE Symposium on Foundations of Computer
 Science (1990), 544–553. Also: Random Structures and Algorithms 3 (1992), 289-304.
+<!-- -->
 J. Naor and M. Naor, Small-bias probability spaces: efficient constructions and applications, SIAM J. on Computing 22, 1993, pp. 838–856.
 Yonatan Aumann, Moshe Lewenstein, Noa Lewenstein, and Dekel Tsur. Finding witnesses by peeling. ACM Trans. Algorithms, 7(2):Art. 24, 15, 2011. doi:10.1145/1921659.1921670.
+<!-- -->
 Andrzej Lingas and Mia Persson. Extreme witnesses and their applications. Algorithmica, 80(12):3943–3957, 2018. doi:10.1007/s00453-018-0492-8.
+<!-- -->
 D. Aingworth, C. Chekuri, and R. Motwani. Fast estimation of diameter and shortest paths (without matrix multiplication). In Proceedings of the Seventh Annual ACMSIAM Symposium on Discrete Algorithms (Atlanta, GA, 1996), pages 547–553. ACM, New York, 1996.
