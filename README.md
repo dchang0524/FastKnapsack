@@ -70,9 +70,7 @@ We can use this approach to find the minimum witnesses to boolean convolutions. 
 <!-- -->
 The simplified coinchange algorithm runs in O(u sqrt n log^3 u + t log u log log u).
 ## Randomized K-Witness \*New\*
-Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4. The k-witnesses can be found in expected O(n k log^2 n) time by keeping a witness set for each result element and checking after every dilution. (I'm actually not sure about this result. The expected time is no worse than O(n k^2 log^2 n), and likely better, but I didn't do the analysis on this. If the expected time is O(n k^2 log^2 n), the overall expected time complexity would be same as the randomized approach mentioned in the paper).
-<!-- -->
-Then algorithm 4 runs in expected O(u log^4 u), meaning coin change can be solved in expected O(u log^5 u + t log u log log u) time.
+Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4.
 
 # Benchmark Results
 # Papers Referenced
