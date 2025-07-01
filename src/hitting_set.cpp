@@ -1,42 +1,16 @@
 #include "hitting_set.h"
 
+/**
+ * Computes a hitting set for the given sets. (A set that contains at least one element from each set.)
+ * Each set contains at least R elements, and each element is in the range [1, n].
+ * The hitting set S has size <= N/R * log u
+ * 
+ */
 vector<int> computeHittingSet(
     const vector<vector<int>>& sets,
-    int R,
-    int n
+    int u, //u is the number of sets
+    int R, //R is the number of elements in each set
+    int n //each element in sets is in [1, n]
 ) {
-    int u = sets.size();
-    // 1) Build inverted index
-    vector<vector<int>> inv(n);
-    for (int i = 0; i < u; i++) {
-        for (int x : sets[i]) {
-            inv[x].push_back(i);
-        }
-    }
-    // 2) freq[x] = number of uncovered sets containing x
-    vector<int> freq(n);
-    for (int x = 0; x < n; x++) {
-        freq[x] = inv[x].size();
-    }
-    vector<bool> covered(u, false);
-    int remaining = u;
-    vector<int> H;
-    H.reserve((int)ceil((double)n / R * log(u + 1)));
-    // 3) Greedy pick
-    while (remaining > 0) {
-        int best = max_element(freq.begin(), freq.end()) - freq.begin();
-        if (freq[best] == 0) break;
-        H.push_back(best);
-        for (int i : inv[best]) {
-            if (!covered[i]) {
-                covered[i] = true;
-                remaining--;
-                for (int y : sets[i]) {
-                    freq[y]--;
-                }
-            }
-        }
-        freq[best] = 0;
-    }
-    return H;
+    
 }

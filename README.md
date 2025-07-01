@@ -60,7 +60,7 @@ First, consider the following lemma: in exepcted O~(n+m) time, we can uniformly 
 <!-- -->
 Now, we look at algorithm 3. First, iterating incrementally for each prefix of size power of 2 of the lexicrographical order, we compute the minimum witnesses of nonzero result elements of the convolution of the prefix and b. We repeat until all such result elements have their minimum witnesses computed by finding all their witnesses in the current prefix using Lemma 5.4. The reason why we use a random permutation for the lexicrographical order is that this allows us to assume that a uniform amount distribution indexes exist in each prefix.
 <!-- -->
-The expected number of samplings is O(log^2 u) per prefix according to the paper, so algorithm 3 runs in expected O(u log^6 u), meaning coinchange can be solved in expected O(u log^7 u + t log u log log u).
+The expected number of samplings is O(log^2 u) according to the paper, so algorithm 3 runs in expected O(u log^5 u), meaning coinchange can be solved in expected O(u log^6 u + t log u log log u).
 ## Simplified O(u sqrt n log^3) Kernel Computation \*New\*
 As mentioned in the paper 'Extreme Witnesses and Their Applications', there exists an algorithm to find k-minimum witnesses to a boolean convolution of length n in O(n sqrt n sqrt k log n) time. This is done by dividing the first array into disjoint groups of size O(sqrt(n/k)), and then computing the convolution between each group and the second array using FFT.
 <!-- -->
@@ -72,7 +72,12 @@ The simplified coinchange algorithm runs in O(u sqrt n log^3 u + t log u log log
 ## Randomized K-Witness \*New\*
 Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4.
 <!-- -->
-The exepected time complexity is not calculated yet, but it runs around x40 faster compared to the other randomized algorithm.
+The exepected time complexity is not proven yet, but it seems to be around O(n log^4 n) to find k = O(log n) witnesses. Thus, algorithm 4 runs in O(u log^5 u), and coinchange can be solved in O(u log^6 u + t log u log log u).
+## Randomized K-Witness, Optimized \*New\*
+Instead of using the dilution approach, we use the randomized O(n log m (k + log k log m)) time algorithm of finding k-aligned ones from "Finding Witnesses by Peeling".
+<!-- -->
+Then, we can sample k = O(log n) witnesses in O(u log^2 n log log n), so algorithm 4 runs in O(u log ^3 n log log n), meaning coinchange can be solved in O(u log^4 n log log n + t log log u).
+
 
 # Benchmark Results
 # Papers Referenced
