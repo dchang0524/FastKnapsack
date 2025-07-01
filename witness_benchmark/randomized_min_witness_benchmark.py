@@ -7,7 +7,7 @@ INCLUDE  = os.path.join(BASE, '..', 'include')
 SOLVER   = os.path.join(BASE, 'randomized_min_witness_test')
 LOG_FILE = os.path.join(BASE, 'random_witness_mismatches.log')
 
-SIZES  = [10, 15, 20, 25, 30, 256, 512, 1024, 2048, 4096]
+SIZES  = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536]
 TRIALS = 3
 
 def compile_solver():

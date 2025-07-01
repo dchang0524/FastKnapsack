@@ -129,7 +129,7 @@ vector<int> randomized_witness_sampling(vector<int>& a, vector<int>& b) {
 /**
  * Finds the minimum witness with respect to a random order in expected O~(n) time.
 */
-vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, vector<int>& w, vector<int>& order) {
+vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, const vector<int>& w, vector<int>& order) {
     unordered_map<int, int> ind; //converts weight to order index
     for (int i = 1; i < sz(order); ++i) {
         ind[w[order[i]]] = i;
@@ -170,34 +170,98 @@ vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, vector<int>& 
         int cnt = 0;
         while (cnt < need) {
             vector<int> sample = randomized_witness_sampling(aPref, b);
-            // cerr << "Sample: " << endl;
-            // for (int i = 0; i < sz(sample); ++i) {
-            //     cerr << sample[i] << " ";
-            // }
-            // cerr << endl;
             for (int i = 0; i < sz(sample); ++i) {
                 if (sample[i] != -1 && found[i] == 0) {
                     // cerr << "Found witness for " << i << ": " << ind[sample[i]] << endl;
                     witSets[i].insert(ind[sample[i]]);
+                    if (min_witness[i] == -1 || ind[sample[i]] < min_witness[i]) {
+                        min_witness[i] = ind[sample[i]];
+                    }
                     if (witSets[i].size() == c[i]) {
                         found[i] = 1;
-                        min_witness[i] = *witSets[i].begin();
                         cnt++;
                     }
                 }
             }
         }
-        // for (int i = 0; i < sz(c); ++i) {
-        //     cerr << "witnees for " << i << ": ";
-        //     for (int i : witSets[i]) {
-        //         cerr << i << " ";
-        //     }
-        //     cerr << endl;
-        // }
         if (l == sz(order) - 1) {
             break;
         }
         l = min(sz(order) - 1, l * 2);
     }
     return min_witness;
+}
+
+/**
+ * A randomized algorithm to find k-wtinesses of a boolean convolution
+ */
+vector<vector<int>> randomized_k_witness(vector<int>& a, vector<int>& b, int k, const vector<int>& w, vector<int>& order) {
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    mt19937 rng(seed);
+    bernoulli_distribution coin(0.5);
+
+    vector<vi> witnesses(a.size() + b.size() - 1, vector<int>());
+    unordered_map<int, int> ind; //converts weight to order index
+    for (int i = 1; i < sz(order); ++i) {
+        ind[w[order[i]]] = i;
+    }
+    vector<int> maxWit = convolution(a, b);
+    int need = 0;
+    for (int i = 0; i < sz(maxWit); ++i) {
+        if (maxWit[i] == 0) {
+            continue;
+        }
+        need++;
+        maxWit[i] = min(maxWit[i], k);
+    }
+    vector<int> c;
+    vector<int> cVal;
+    int cnt = 0;
+    while (cnt < need) {
+        int K = (int)ceil(log2(sz(a)));
+        vector<int> aDiluted(a.size(), 0);
+        rep(i, 0, sz(a)) {
+            aDiluted[i] = a[i];
+        }
+        vector<int> aInd(a.size(), 0);
+        for (int i = 0; i < sz(a); ++i) {
+            if (a[i] > 0) {
+                aInd[i] = i;
+            }
+        }
+        rep (i, 0, K) {
+            rep(i, 0, sz(aDiluted)) {
+                int bit = coin(rng) ? 1 : 0;
+                aDiluted[i] = aDiluted[i] & bit;          
+            }
+            rep(i, 0, sz(aDiluted)) {
+                if (aDiluted[i] > 0) {
+                    aInd[i] = i;
+                } else {
+                    aInd[i] = 0;
+                }
+            }
+            c = convolution(aDiluted, b);
+            cVal = convolution(aInd, b);
+            rep(i, 0, sz(c)) {
+                if (c[i] > 0 && witnesses[i].size() < maxWit[i]) {
+                    int newWit = c[i];
+                    int witVal = cVal[i];
+                    for (int wit : witnesses[i]) {
+                        if (aDiluted[w[order[wit]]] == 1) {
+                            newWit -= 1;
+                            witVal -= w[order[wit]];
+                        }
+                    }
+                    if (newWit == 1) {
+                        witnesses[i].push_back(ind[witVal]);
+                        if (witnesses[i].size() == maxWit[i]) {
+                            cnt++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return witnesses;
 }

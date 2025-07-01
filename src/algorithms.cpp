@@ -173,6 +173,64 @@ void kernelComputation_coinchange_simple(
     }
 }
 
+void kernelComputation_coinchange_randomized(
+    int n,                              // number of coins
+    int u,                              // maximum coin weight
+    const vector<int>& w,               // weights of the coins (1-indexed)
+    const vector<int>& p,               // profits of the coins  (1-indexed)
+    vector<int>& order,           // lexicographical order σ[1..n]
+    int t,                          // (unused) global target bound
+    vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
+) {
+    int k  = static_cast<int>(floor(2.0 * log2(u) + 1.0));
+    // cout << "kernel size " << k << endl; 
+    int KU = k * u + 1;
+
+    // prepare sol[0..KU-1]
+    sol.assign(max(KU, t + 1), solution());
+
+    // v[c] = can reach capacity c so far
+    vector<int> v(KU), f(u+1);
+    v[0] = 1;
+    f[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        f[w[order[i]]] = 1;
+    }
+
+    vector<int> inverseOrder(n+1);
+    for (int i = 1; i <= n; i++) {
+        inverseOrder[order[i]] = i;
+    }
+
+    vector<int> vPrime;
+    random_shuffle(order.begin() + 1, order.end());
+    for (int iter = 1; iter <= k; iter++) { //compute iter-kernel
+        // 1) boolean convolve to get new reachable capacities
+        vPrime = boolCnv(v, f);
+
+        // 2) Find minimum witness for each reachable capacity
+        //randomize order
+        vector<int> minW = minimum_witness_random(f, v, w, order);
+        // 3) reconstruct each kernel solution
+        for (int c = 1; c < KU; c++) {
+            if (vPrime[c] == 1 && v[c] == 0) {
+                // cerr << "first time reaching capacity " << c << " at " << iter << endl;
+                // accept new reachable capacity
+                v[c] = vPrime[c];
+
+                // find the minimum witness 
+                int witnessI = minW[c];
+                int coinIdx = inverseOrder[witnessI];
+                int prev    = c - w[coinIdx];
+                if (prev >= 0) {
+                    sol[prev].copy(sol[c]);
+                }
+                sol[c].addCoin(witnessI, w[coinIdx], -1); //note in coinchange, the profit array is just -1
+            }
+        }
+    }
+}
+
 void kernelComputation_coinchange(
     int n,                              // number of coins
     int u,                              // maximum coin weight
@@ -243,15 +301,15 @@ void adaptiveMinWitness(
     vector<vector<int>>& a,
     vector<vector<int>>& b,
     vector<vector<int>>& c,
-    vector<int>& sigma
+    vector<int>& order
 ) {
     //assuming c also contains zero elements bigger than the index of the last nonzero element
     int k = 2 * static_cast<int>(ceil(log2(c.size()) + log2(c[0].size()))); //2*log(pt)
 
-    int size = sigma.size();
-    unordered_set<int> order;
-    for (int i = 1; i <= sigma.size(); i++) {
-        order.insert(i);
+    int size = order.size();
+    unordered_set<int> orderSet;
+    for (int i = 1; i <= order.size(); i++) {
+        orderSet.insert(i);
     }
     while (size > 1) { //size will be <= size/2 after every iteration
         vector<vector<vector<int>>> witnesses(c.size(), vector<vector<int>>(c[0].size())); // witnesses[i][j] = witness of a[i][j]

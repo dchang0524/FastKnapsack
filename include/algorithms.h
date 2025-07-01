@@ -36,6 +36,16 @@ void kernelComputation_coinchange_simple(
     vector<solution>& sol
 );
 
+void kernelComputation_coinchange_randomized(
+    int n,                              // number of coins
+    int u,                              // maximum coin weight
+    const vector<int>& w,               // weights of the coins (1-indexed)
+    const vector<int>& p,               // profits of the coins  (1-indexed)
+    vector<int>& order,           // lexicographical order σ[1..n]
+    int t,                          // (unused) global target bound
+    vector<solution>& sol              // output: sol[c] for c∈[0..k·u]
+);
+
 void kernelComputation_coinchange(
     int n, int u,
     const vector<int>& w,

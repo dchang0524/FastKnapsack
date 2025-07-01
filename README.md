@@ -56,11 +56,11 @@ applications'), and we are required to iterate through the whole probability spa
 ## Randomized Algorithm (Algorithm 3)
 The main paper also provides a randomized alternative to Algorithm 4.
 <!-- -->
-First, consider the following lemma: in exepcted O~(n+m) time, we can uniformly sample a witness for each result element of the boolean convolution of two arrays (Lemma 5.4). In fact, it can be done in expected O(n log^2 n) time. First, start with the array a and b, and their boolean convolution c. Let c' be the polynomial convolution of a' and b, where a'[i] = i if a[i] = 1. Let r the polynomial convolution of a and b. Note if r[i] = 1, then c'[i] is a witness to the result element in i. How the algorithm works is that we gradually dilute the array a by turning each element to 0 with probability 1/2. Then, in expected O(log n) steps, the entries in r[i] will change to 0, ideally becoming 1 before becoming 0. If there are some elements which didn't become a 1 before 0, we run the algorithm again. In expected O(log n) iterations of this algorithm, all result elements will have found a witness. This witness is uniformly sampled as all entries can become diluted with equal probabilty. 
+First, consider the following lemma: in exepcted O~(n+m) time, we can uniformly sample a witness for each result element of the boolean convolution of two arrays (Lemma 5.4). In fact, it can be done in expected O(n log^3 n) time. First, start with the array a and b, and their boolean convolution c. Let c' be the polynomial convolution of a' and b, where a'[i] = i if a[i] = 1. Let r the polynomial convolution of a and b. Note if r[i] = 1, then c'[i] is a witness to the result element in i. How the algorithm works is that we gradually dilute the array a by turning each element to 0 with probability 1/2. Then, in expected O(log n) steps, the entries in r[i] will change to 0, ideally becoming 1 before becoming 0. If there are some elements which didn't become a 1 before 0, we run the algorithm again. In expected O(log n) iterations of this algorithm, all result elements will have found a witness. This witness is uniformly sampled as all entries can become diluted with equal probabilty. 
 <!-- -->
 Now, we look at algorithm 3. First, iterating incrementally for each prefix of size power of 2 of the lexicrographical order, we compute the minimum witnesses of nonzero result elements of the convolution of the prefix and b. We repeat until all such result elements have their minimum witnesses computed by finding all their witnesses in the current prefix using Lemma 5.4. The reason why we use a random permutation for the lexicrographical order is that this allows us to assume that a uniform amount distribution indexes exist in each prefix.
 <!-- -->
-The expected number of samplings is O(log^2 u) according to the paper, so algorithm 3 runs in expected O(u log^5 u), meaning coinchange can be solved in expected O(u log^6 u + t log u log log u).
+The expected number of samplings is O(log^2 u) per prefix according to the paper, so algorithm 3 runs in expected O(u log^6 u), meaning coinchange can be solved in expected O(u log^7 u + t log u log log u).
 ## Simplified O(u sqrt n log^3) Kernel Computation \*New\*
 As mentioned in the paper 'Extreme Witnesses and Their Applications', there exists an algorithm to find k-minimum witnesses to a boolean convolution of length n in O(n sqrt n sqrt k log n) time. This is done by dividing the first array into disjoint groups of size O(sqrt(n/k)), and then computing the convolution between each group and the second array using FFT.
 <!-- -->
@@ -71,6 +71,8 @@ We can use this approach to find the minimum witnesses to boolean convolutions. 
 The simplified coinchange algorithm runs in O(u sqrt n log^3 u + t log u log log u).
 ## Randomized K-Witness \*New\*
 Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4.
+<!-- -->
+The exepected time complexity is not calculated yet, but it runs around x40 faster compared to the other randomized algorithm.
 
 # Benchmark Results
 # Papers Referenced

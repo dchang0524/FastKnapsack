@@ -20,5 +20,7 @@ vector<int> randomized_witness_sampling(vector<int>& a, vector<int>& b);
 /**
  * Finds the minimum witness with respect to a random order in expected O~(n) time.
  */
-vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, vector<int>& w, vector<int>& order);
+vector<int> minimum_witness_random(vector<int>& a, vector<int>& b, const vector<int>& w, vector<int>& order);
+
+vector<vector<int>> randomized_k_witness(vector<int>& a, vector<int>& b, int k, const vector<int>& w, vector<int>& order);
 #endif
