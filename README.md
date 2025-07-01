@@ -85,13 +85,14 @@ Minyang Deng, Xiao Mao, Ziqian Zhong. On Problems Related to Unbounded SubsetSum
 <!-- -->
 N. Alon and M. Naor. Derandomization, witnesses for Boolean matrix multiplication and construction of perfect hash functions. Algorithmica, 16(4-5):434–449, 1996. doi:10.1007/s004539900059.
 <!-- -->
+Yonatan Aumann, Moshe Lewenstein, Noa Lewenstein, and Dekel Tsur. Finding witnesses by peeling. ACM Trans. Algorithms, 7(2):Art. 24, 15, 2011. doi:10.1145/1921659.1921670.
+<!-- -->
+Andrzej Lingas and Mia Persson. Extreme witnesses and their applications. Algorithmica, 80(12):3943–3957, 2018. doi:10.1007/s00453-018-0492-8.
+<!-- -->
 N. Alon, O. Goldreich, J. Hastad and R. Peralta , Simple constructions of almost k-wise
 independent random variables, Proc. 31st IEEE Symposium on Foundations of Computer
 Science (1990), 544–553. Also: Random Structures and Algorithms 3 (1992), 289-304.
 <!-- -->
 J. Naor and M. Naor, Small-bias probability spaces: efficient constructions and applications, SIAM J. on Computing 22, 1993, pp. 838–856.
-Yonatan Aumann, Moshe Lewenstein, Noa Lewenstein, and Dekel Tsur. Finding witnesses by peeling. ACM Trans. Algorithms, 7(2):Art. 24, 15, 2011. doi:10.1145/1921659.1921670.
-<!-- -->
-Andrzej Lingas and Mia Persson. Extreme witnesses and their applications. Algorithmica, 80(12):3943–3957, 2018. doi:10.1007/s00453-018-0492-8.
 <!-- -->
 D. Aingworth, C. Chekuri, and R. Motwani. Fast estimation of diameter and shortest paths (without matrix multiplication). In Proceedings of the Seventh Annual ACMSIAM Symposium on Discrete Algorithms (Atlanta, GA, 1996), pages 547–553. ACM, New York, 1996.
