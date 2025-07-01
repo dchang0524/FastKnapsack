@@ -61,7 +61,7 @@ First, consider the following lemma: in exepcted O~(n+m) time, we can uniformly 
 Now, we look at algorithm 3. First, iterating incrementally for each prefix of size power of 2 of the lexicrographical order, we compute the minimum witnesses of nonzero result elements of the convolution of the prefix and b. We repeat until all such result elements have their minimum witnesses computed by finding all their witnesses in the current prefix using Lemma 5.4. The reason why we use a random permutation for the lexicrographical order is that this allows us to assume that a uniform amount distribution indexes exist in each prefix.
 <!-- -->
 The expected number of samplings is O(log^2 u) according to the paper, so algorithm 3 runs in expected O(u log^5 u), meaning coinchange can be solved in expected O(u log^6 u + t log u log log u).
-## Simplified O(u sqrt n log^3) Kernel Computation **New**
+## Simplified O(u sqrt n log^3) Kernel Computation \*New\*
 As mentioned in the paper 'Extreme Witnesses and Their Applications', there exists an algorithm to find k-minimum witnesses to a boolean convolution of length n in O(n sqrt n sqrt k log n) time. This is done by dividing the first array into disjoint groups of size O(sqrt(n/k)), and then computing the convolution between each group and the second array using FFT.
 <!-- -->
 We can naturally extend the result of this paper to finding k-minimum witnesses to a boolean convolution under a specific lexicographical order. We can do this by dividing the lexicographical permutation into O(sqrt n/k) sized groups that contain contiguous elements and are disjoint. Then, we replace the numbers i in each group with a[i], then compute the boolean convolution of each group with b. Then, we can proceed identically as the paper 'Extreme Witnesses and Their Applications'.
@@ -69,7 +69,7 @@ We can naturally extend the result of this paper to finding k-minimum witnesses 
 We can use this approach to find the minimum witnesses to boolean convolutions. An additional benefit is that this allows us to pick a specific lexicographical order unlike the adaptive/randomized version of the algorithm.
 <!-- -->
 The simplified coinchange algorithm runs in O(u sqrt n log^3 u + t log u log log u).
-## Randomized K-Witness **New**
+## Randomized K-Witness \*New\*
 Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4. The k-witnesses can be found in expected O(n k log^2 n) time by keeping a witness set for each result element and checking after every dilution. (I'm actually not sure about this result. The expected time is no worse than O(n k^2 log^2 n), and likely better, but I didn't do the analysis on this. If the expected time is O(n k^2 log^2 n), the overall expected time complexity would be same as the randomized approach mentioned in the paper).
 <!-- -->
 Then algorithm 4 runs in expected O(u log^4 u), meaning coin change can be solved in expected O(u log^5 u + t log u log log u) time.
