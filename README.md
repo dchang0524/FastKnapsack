@@ -73,13 +73,14 @@ The simplified coinchange algorithm runs in O(u sqrt n log^3 u + t log u log log
 Instead of using the randomized approach to find the minimum witnesses with respect to a random permutation (as proposed in the paper), we could instead try using a similar randomized algoriithm to find k-witnesses, then apply algorithm 4.
 <!-- -->
 The exepected time complexity is not proven yet, but it seems to be around O(n log^4 n) to find k = O(log n) witnesses. Thus, algorithm 4 runs in O(u log^5 u), and coinchange can be solved in O(u log^6 u + t log u log log u).
+<!-- -->
+Although this is theoretically equally fast as the randomized algorithm provided in the paper, Algorithm 4 runs x20 times faster (at u = 65536) with this version of randomized k-witness, and this algorithm is fast enough to outperform the traditional coinchange algorithms in realistic settings.
 ## Randomized K-Witness, Optimized \*New\*
 Instead of using the dilution approach, we use the randomized O(n log m (k + log k log m)) time algorithm of finding k-aligned ones from "Finding Witnesses by Peeling".
 <!-- -->
 Then, we can sample k = O(log n) witnesses in O(u log^2 n log log n), so algorithm 4 runs in O(u log ^3 n log log n), meaning coinchange can be solved in O(u log^4 n log log n + t log log u).
-
-
-# Benchmark Results
+<!-- -->
+Although this is the currently theoretically fastest algorithm to solve the coinchange problem, due to high constant factors it remains impractical in real-life.
 # Papers Referenced
 Minyang Deng, Xiao Mao, Ziqian Zhong. On Problems Related to Unbounded SubsetSum: A Unified Combinatorial Approach. https://arxiv.org/abs/2202.13484
 <!-- -->

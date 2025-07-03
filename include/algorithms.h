@@ -63,4 +63,12 @@ void adaptiveMinWitness(
     vector<int>& sigma
 );
 
-#endif // ALGORITHMS_H
+vector<vector<int>> adaptiveMinWitness_randomized(
+    vector<vector<int>>& a,
+    vector<vector<int>>& b,
+    vector<vector<int>>& c,
+    vector<int>& w,
+    vector<int>& order
+);
+
+#endif

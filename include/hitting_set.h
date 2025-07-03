@@ -7,6 +7,7 @@
 // returns a hitting set H ⊆ [0..n) with |H| ≤ ⌈(n/R)·ln(u)⌉.
 vector<int> computeHittingSet(
     const vector<vector<int>>& sets,
+    int u,
     int R,
     int n
 );

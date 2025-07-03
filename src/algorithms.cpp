@@ -279,7 +279,7 @@ void kernelComputation_coinchange(
             v[i] = vPrime[i];
         }
     }
-    adaptiveMinWitness(a, b, c, order);
+    //adaptiveMinWitness(a, b, c, order);
     //reorder arrays so that with respect to adaptive lex order so that (1, ..., n) is the lex order
     for (int iter = 1; iter <= k; iter++) {
         for (int i = 1; i <= KU; i++) {
@@ -301,11 +301,12 @@ void adaptiveMinWitness(
     vector<vector<int>>& a,
     vector<vector<int>>& b,
     vector<vector<int>>& c,
+    vector<int>& w,
     vector<int>& order
 ) {
     //assuming c also contains zero elements bigger than the index of the last nonzero element
     int k = 2 * static_cast<int>(ceil(log2(c.size()) + log2(c[0].size()))); //2*log(pt)
-
+    vector<int> newOrder;
     int size = order.size();
     unordered_set<int> orderSet;
     for (int i = 1; i <= order.size(); i++) {
@@ -315,6 +316,7 @@ void adaptiveMinWitness(
         vector<vector<vector<int>>> witnesses(c.size(), vector<vector<int>>(c[0].size())); // witnesses[i][j] = witness of a[i][j]
         for (int i = 0; i < c.size(); i++) {
             //k-reconstruction
+            auto witnesses = randomized_k_witness(a[i], b[i], k, w, order);
             //for entries with < k witnesses, store their witnesses in witnesses[i][j]
             //for entries with k witnesses, store its witnesses somewhere to compute their hitting set
         }
@@ -324,5 +326,114 @@ void adaptiveMinWitness(
         //recompute c
     }
     //if witnesses[i][j].size() > 1, manually compute its minimum witness using sigma
+}
+
+vector<vector<int>> adaptiveMinWitness_randomized(
+    vector<vector<int>>& a,
+    vector<vector<int>>& b,
+    vector<vector<int>>& c,
+    vector<int>& w,
+    vector<int>& order
+) {
+    int p = a.size();
+    if (p == 0) return {};
+    int n = order.size();
+    int r = (int)c[0].size();      // = 2*n - 1
+
+    // fixed k = 2·⌈log₂(p) + log₂(r)⌉
+    int k = 2 * static_cast<int>(ceil(log2(p) + log2(r)));
+
+    // output array, initialized to -1
+    vector<vector<int>> res(p, vector<int>(r, -1));
+
+    vector<int> newOrder;
+    int size = n;
+
+    // temp to tie-break by final order
+    vector<int> posMap(n);
+
+    // scratch for storing <k witnesses
+    vector<vector<vector<int>>> witnesses(p, vector<vector<int>>(r));
+
+    while (size > 1) {
+      // 1) collect witnesses for each row i
+      vector<vector<int>> bigSets;
+      bigSets.reserve(p * r);
+
+      for (int i = 0; i < p; ++i) {
+        auto rec = randomized_k_witness(a[i], b[i], k, w, order);
+        for (int j = 0; j < r; ++j) {
+          if (rec[j].size() < (size_t)k) {
+            witnesses[i][j] = move(rec[j]);
+          } else {
+            bigSets.push_back(move(rec[j]));
+          }
+        }
+      }
+
+      // 2) if no “big” sets remain, we can finalize everything now
+      if (bigSets.empty()) {
+        // build position map for final tie-break
+        for (int idx = 0; idx < size; ++idx)
+          posMap[ order[idx] ] = idx;
+
+        // tie-break each multi-candidate entry
+        for (int i = 0; i < p; ++i) {
+          for (int j = 0; j < r; ++j) {
+            if (c[i][j] > 0 && witnesses[i][j].size() > 1) {
+              int best = witnesses[i][j][0];
+              for (int x : witnesses[i][j])
+                if (posMap[x] < posMap[best])
+                  best = x;
+              res[i][j] = best;
+            }
+            // also fill singleton cases:
+            else if (c[i][j] > 0 && witnesses[i][j].size() == 1) {
+              res[i][j] = witnesses[i][j][0];
+            }
+          }
+        }
+        return res;
+      }
+
+      // 3) compute hitting set H of all bigSets
+      auto H = computeHittingSet(bigSets, (int)bigSets.size(), k, size);
+
+      // 4) rebuild `order` so that H is the new prefix
+      vector<bool> inH(n,false);
+      for (int x : H) inH[x] = true;
+      newOrder.clear();
+      newOrder.reserve(H.size());
+      for (int x : order)
+        if (inH[x])
+          newOrder.push_back(x);
+      size = (int)newOrder.size();    // now ≤ old size/2
+      order.swap(newOrder);
+
+      // 5) restrict a,b to the new prefix of length `size` and recompute c
+      r = 2*size - 1;
+      for (int i = 0; i < p; ++i) {
+        vector<int> ai(size), bi(size);
+        for (int t = 0; t < size; ++t) {
+          ai[t] = a[i][ order[t] ];
+          bi[t] = b[i][ order[t] ];
+        }
+        auto ci = convolution(ai, bi);
+        c[i].swap(ci);
+      }
+      // resize our witness‐scratch to match new r
+      witnesses.assign(p, vector<vector<int>>(r));
+    }
+
+    // If we exit because size<=1, then each remaining c[i][j]>0 has at most one coin
+    // in scope, so that singleton (or -1) is the answer:
+    for (int i = 0; i < p; ++i) {
+      for (int j = 0; j < r; ++j) {
+        if (c[i][j] > 0 && witnesses[i][j].size() == 1) {
+          res[i][j] = witnesses[i][j][0];
+        }
+      }
+    }
+    return res;
 }
 
