@@ -3,25 +3,30 @@
 
 #include "constants.h"
 
-/**
- * Randomized k-matches reconstruction.
- * text: binary string of length n ("0"/"1").
- * pat:  binary pattern string of length m.
- * k:    number of ones to recover per alignment.
- * 
- * Returns a vector of length (n-m+1), where each entry is a sorted list
- * of recovered positions in [0, m).
- */
+// For alignment i, return min(k, matches) distinct pattern positions j
+// with text[i+j] == pat[j] == '1'. Results are sorted and exact.
 std::vector<std::vector<int>> k_reconstruct_randomized(
     string &text,
     string &pat,
     int k
 );
 
-/**
- * Randomized k-wtitness
- */
+// Deterministic k-reconstruction using the explicit c-wise almost-independent
+// dilution space and exact convolution witness counts.
+std::vector<std::vector<int>> k_reconstruct_deterministic(
+    string &text,
+    string &pat,
+    int k
+);
+
+// Binary-array version of the same alignment contract.
 vector<std::vector<int>> k_find_witnesses_randomized(
+    vector<int> &a,
+    vector<int> &b,
+    int k
+);
+
+vector<std::vector<int>> k_find_witnesses_deterministic(
     vector<int> &a,
     vector<int> &b,
     int k

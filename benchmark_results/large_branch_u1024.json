@@ -1,0 +1,80 @@
+[
+  {
+    "problem": "coinchange",
+    "method": "simple-dp",
+    "u": 1024,
+    "n": 1024,
+    "target": 8192,
+    "trial": 0,
+    "status": "ok",
+    "wall_seconds": 0.012270583072677255,
+    "algorithm_seconds": 0.00517229,
+    "kernel_seconds": null,
+    "propagation_seconds": null
+  },
+  {
+    "problem": "coinchange",
+    "method": "optimized-peeling",
+    "u": 1024,
+    "n": 1024,
+    "target": 8192,
+    "trial": 0,
+    "status": "timeout",
+    "wall_seconds": 600.0,
+    "algorithm_seconds": null,
+    "kernel_seconds": null,
+    "propagation_seconds": null
+  },
+  {
+    "problem": "coinchange",
+    "method": "paper-random",
+    "u": 1024,
+    "n": 1024,
+    "target": 8192,
+    "trial": 0,
+    "status": "ok",
+    "wall_seconds": 59.62825491698459,
+    "algorithm_seconds": 59.6111,
+    "kernel_seconds": 59.6105,
+    "propagation_seconds": 0.000472667
+  },
+  {
+    "problem": "coinchange",
+    "method": "simplified",
+    "u": 1024,
+    "n": 1024,
+    "target": 8192,
+    "trial": 0,
+    "status": "ok",
+    "wall_seconds": 1.5010555419139564,
+    "algorithm_seconds": 1.49163,
+    "kernel_seconds": 1.49123,
+    "propagation_seconds": 0.000335625
+  },
+  {
+    "problem": "knapsack",
+    "method": "simple-dp",
+    "u": 1024,
+    "n": 1024,
+    "target": 8192,
+    "trial": 0,
+    "status": "ok",
+    "wall_seconds": 0.012101915897801518,
+    "algorithm_seconds": 0.00421104,
+    "kernel_seconds": null,
+    "propagation_seconds": null
+  },
+  {
+    "problem": "knapsack",
+    "method": "paper-kernel",
+    "u": 1024,
+    "n": 1024,
+    "target": 8192,
+    "trial": 0,
+    "status": "ok",
+    "wall_seconds": 0.4059483748860657,
+    "algorithm_seconds": 0.39702,
+    "kernel_seconds": 0.393477,
+    "propagation_seconds": 0.00182008
+  }
+]

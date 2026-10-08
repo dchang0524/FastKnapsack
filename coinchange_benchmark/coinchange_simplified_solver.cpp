@@ -2,11 +2,13 @@
 #include <vector>
 #include <chrono>
 #include <algorithm>
+#include <cstdlib>
+#include "witness.h"
 #include "algorithms.h"
 #include "dp_structs.h"
 using namespace std;
 
-int main(){
+int main(int argc, char** argv){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
@@ -17,15 +19,32 @@ int main(){
     vector<int> w(n+1), p(n+1), order(n+1);
     for(int i = 1; i <= n; i++){
         cin >> w[i] >> p[i];
+        p[i] = -1; // Coin change minimizes the number of coins.
         order[i] = i;
     }
 
     vector<solution> sol;
+    const bool diagnostics = std::getenv("FASTKNAPSACK_WITNESS_STATS") != nullptr;
+    if (diagnostics) reset_randomized_witness_stats();
     auto total_start = chrono::high_resolution_clock::now();
 
     // 1) Kernel computation
     auto k0 = chrono::high_resolution_clock::now();
-    kernelComputation_coinchange_simple(n, u, w, p, order, T, sol);
+    const string method = argc > 1 ? argv[1] : "deterministic";
+    if (method == "deterministic")
+        kernelComputation_coinchange(n, u, w, p, order, T, sol);
+    else if (method == "randomized-k")
+        kernelComputation_coinchange(n, u, w, p, order, T, sol, true);
+    else if (method == "optimized-peeling")
+        kernelComputation_coinchange_optimized(n, u, w, p, order, T, sol);
+    else if (method == "paper-random")
+        kernelComputation_coinchange_randomized(n, u, w, p, order, T, sol);
+    else if (method == "simplified")
+        kernelComputation_coinchange_simple(n, u, w, p, order, T, sol);
+    else {
+        cerr << "Unknown method: " << method << '\n';
+        return 2;
+    }
     auto k1 = chrono::high_resolution_clock::now();
     double ktime = chrono::duration<double>(k1 - k0).count();
     cerr << "Kernel computation took " << ktime << " s\n";
@@ -59,6 +78,13 @@ int main(){
     auto total_end = chrono::high_resolution_clock::now();
     double tot = chrono::duration<double>(total_end - total_start).count();
     cerr << "Total elapsed time: " << tot << " s\n";
+    if (diagnostics) {
+        const auto stats = randomized_witness_stats();
+        cerr << "Witness stats: " << stats.requested_enumeration_calls << ' '
+             << stats.pair_enumeration_calls << ' ' << stats.sampling_calls << ' '
+             << stats.dilution_chains << ' ' << stats.weighted_convolutions << ' '
+             << stats.max_k << '\n';
+    }
 
     // 5) Emit the coin‐change result (# coins or -1)
     for(int t = 0; t <= T; t++){

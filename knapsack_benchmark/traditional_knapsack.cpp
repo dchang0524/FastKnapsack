@@ -1,5 +1,8 @@
 // src/traditional.cpp
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <vector>
 using namespace std;
 typedef long long ll;
 
@@ -18,6 +21,7 @@ int main(){
     const int NEG_INF = -1000000000;
     vector<ll> dp(t+1, NEG_INF);
     dp[0] = 0;
+    auto start = chrono::steady_clock::now();
     // classic unbounded DP: for each coin, for c from w…t
     for(int i=1;i<=n;i++){
         for(int c=w[i]; c<=t; ++c){
@@ -25,6 +29,9 @@ int main(){
                 dp[c] = max(dp[c], dp[c-w[i]] + p[i]);
         }
     }
+    auto finish = chrono::steady_clock::now();
+    cerr << "Total elapsed time: "
+         << chrono::duration<double>(finish - start).count() << " s\n";
     // output exactly the same format as your optimized solver
     for(int c=0;c<=t;c++){
         if(dp[c]==NEG_INF) 

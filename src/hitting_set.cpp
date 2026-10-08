@@ -1,78 +1,50 @@
 #include "hitting_set.h"
-#include <vector>
-#include <list>
-#include <algorithm>
+#include <queue>
+#include <stdexcept>
 
-using namespace std;
-
-/**
- * Fast greedy hitting-set via bucket queue for O(total input size) time.
- */
 vector<int> computeHittingSet(
-    const vector<vector<int>>& sets,
-    int u, // number of sets
-    int R,
-    int n  // universe size
+    const vector<vector<int>>& sets, int u, int R, int n
 ) {
-    // Inverse index: element -> list of sets containing it
-    vector<vector<int>> elementToSets(n + 1);
-    for (int s = 0; s < u; ++s) {
-        for (int e : sets[s]) {
-            if (e >= 1 && e <= n) {
-                elementToSets[e].push_back(s);
+    if (u != static_cast<int>(sets.size()) || R <= 0 || n < 0)
+        throw invalid_argument("invalid hitting-set dimensions");
+    vector<vector<int>> incidence(n);
+    for (int set = 0; set < u; ++set) {
+        if (static_cast<int>(sets[set].size()) < R)
+            throw invalid_argument("hitting-set input below threshold");
+        for (int element : sets[set]) {
+            if (element < 0 || element >= n)
+                throw invalid_argument("hitting-set element out of range");
+            incidence[element].push_back(set);
+        }
+    }
+    vector<int> coverage(n);
+    priority_queue<pair<int, int>> queue;
+    for (int element = 0; element < n; ++element) {
+        coverage[element] = static_cast<int>(incidence[element].size());
+        if (coverage[element]) queue.emplace(coverage[element], element);
+    }
+    vector<unsigned char> covered(u), selected(n);
+    vector<int> result;
+    int left = u;
+    while (left) {
+        while (!queue.empty() &&
+               (selected[queue.top().second] ||
+                queue.top().first != coverage[queue.top().second]))
+            queue.pop();
+        if (queue.empty() || queue.top().first == 0)
+            throw runtime_error("hitting-set input contains an uncovered empty set");
+        int element = queue.top().second;
+        queue.pop();
+        selected[element] = 1;
+        result.push_back(element);
+        for (int set : incidence[element]) if (!covered[set]) {
+            covered[set] = 1;
+            --left;
+            for (int other : sets[set]) if (!selected[other]) {
+                --coverage[other];
+                queue.emplace(coverage[other], other);
             }
         }
     }
-
-    vector<bool> covered(u, false);
-    int uncoveredCount = u;
-    vector<int> hittingSet;
-
-    // Compute initial cover counts and bucket structure
-    vector<int> coverCount(n + 1, 0);
-    for (int e = 1; e <= n; ++e) {
-        coverCount[e] = static_cast<int>(elementToSets[e].size());
-    }
-    // Buckets indexed by coverCount, range [0..u]
-    vector<list<int>> buckets(u + 1);
-    vector<list<int>::iterator> pos(n + 1);
-    int maxCount = 0;
-    for (int e = 1; e <= n; ++e) {
-        int c = coverCount[e];
-        buckets[c].push_front(e);
-        pos[e] = buckets[c].begin();
-        maxCount = max(maxCount, c);
-    }
-
-    // Greedy selection loop
-    while (uncoveredCount > 0 && maxCount > 0) {
-        // Pick element with current highest coverage
-        int elem = buckets[maxCount].front();
-        buckets[maxCount].pop_front();
-        coverCount[elem] = 0; // mark as selected
-        hittingSet.push_back(elem);
-
-        // Cover all sets hit by this element and update cover counts
-        for (int s : elementToSets[elem]) {
-            if (!covered[s]) {
-                covered[s] = true;
-                --uncoveredCount;
-                // Decrement cover count for each element in this set
-                for (int e2 : sets[s]) {
-                    int c2 = coverCount[e2];
-                    if (c2 > 0) {
-                        buckets[c2].erase(pos[e2]);
-                        buckets[c2 - 1].push_front(e2);
-                        pos[e2] = buckets[c2 - 1].begin();
-                        --coverCount[e2];
-                    }
-                }
-            }
-        }
-        // Move maxCount down to next non-empty bucket
-        while (maxCount > 0 && buckets[maxCount].empty()) {
-            --maxCount;
-        }
-    }
-    return hittingSet;
+    return result;
 }

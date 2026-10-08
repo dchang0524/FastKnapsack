@@ -36,8 +36,11 @@ int main(){
     int maxSize = 0;
     int maxInd = -1;
     for (int i = 0; i <= t && i < (int)sol.size(); i++) {
-        maxSize = max(maxSize, static_cast<int>(sol[i].svec.size()));
-        maxInd = i;
+        int support = static_cast<int>(sol[i].svec.size());
+        if (support > maxSize) {
+            maxSize = support;
+            maxInd = i;
+        }
     }
     // Print the entries of the solution with the maximum support size
     if (maxInd != -1) {

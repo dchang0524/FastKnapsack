@@ -32,17 +32,19 @@ bool solution::lexCmp(const solution &s2) {
     auto it1 = svec.begin(), end1 = svec.end();
     auto it2 = s2.svec.begin(), end2 = s2.svec.end();
 
-    // walk in lock‐step over the sorted maps
-    while (it1 != end1 && it2 != end2) {
-        if (it1->first != it2->first)
-            return it1->first < it2->first;
+    // The first differing multiplicity in rank order decides the comparison.
+    // The paper uses the order that prefers more copies of the earlier coin.
+    while (it1 != end1 || it2 != end2) {
+        if (it2 == end2 || (it1 != end1 && it1->first < it2->first))
+            return it1->second > 0;
+        if (it1 == end1 || it2->first < it1->first)
+            return false;
         if (it1->second != it2->second)
             return it1->second > it2->second;
         ++it1;
         ++it2;
     }
-    // the shorter map (fewer distinct coins) is lex‐smaller
-    return (it1 == end1) && (it2 != end2);
+    return false;
 }
 
 //copy s1 over to s2

@@ -18,3 +18,4 @@
 using namespace std;
 typedef long long ll;
 const int NEG_INF = -1000000000; // Negative infinity placeholder
+const ll NEG_INF_LL = LLONG_MIN / 4;

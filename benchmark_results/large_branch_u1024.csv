@@ -1,0 +1,7 @@
+problem,method,u,n,target,trial,status,wall_seconds,algorithm_seconds,kernel_seconds,propagation_seconds
+coinchange,simple-dp,1024,1024,8192,0,ok,0.012270583072677255,0.00517229,,
+coinchange,optimized-peeling,1024,1024,8192,0,timeout,600.0,,,
+coinchange,paper-random,1024,1024,8192,0,ok,59.62825491698459,59.6111,59.6105,0.000472667
+coinchange,simplified,1024,1024,8192,0,ok,1.5010555419139564,1.49163,1.49123,0.000335625
+knapsack,simple-dp,1024,1024,8192,0,ok,0.012101915897801518,0.00421104,,
+knapsack,paper-kernel,1024,1024,8192,0,ok,0.4059483748860657,0.39702,0.393477,0.00182008

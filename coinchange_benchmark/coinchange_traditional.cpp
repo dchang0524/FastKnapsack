@@ -1,5 +1,8 @@
 // coinchange_traditional.cpp
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 int main(){
@@ -16,12 +19,16 @@ int main(){
     const int INF = 1e9;
     vector<int> dp(T+1, INF);
     dp[0] = 0;
+    auto start = chrono::steady_clock::now();
     for(int i=0;i<n;i++){
         for(int t=w[i]; t<=T; t++){
             if(dp[t-w[i]]!=INF)
                 dp[t] = min(dp[t], dp[t-w[i]] + 1);
         }
     }
+    auto finish = chrono::steady_clock::now();
+    cerr << "Total elapsed time: "
+         << chrono::duration<double>(finish - start).count() << " s\n";
     for(int t=0; t<=T; t++){
         cout << (dp[t]==INF ? -1 : dp[t]) << "\n";
     }

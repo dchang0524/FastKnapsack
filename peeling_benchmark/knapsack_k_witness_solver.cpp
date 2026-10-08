@@ -17,7 +17,7 @@ int main(){
     for(int i = 0; i < n; i++) cin >> order[i];
 
     // compute k witnesses
-    auto witnesses = k_find_witnesses_knapsack(a, b, w, order, k);
+    auto witnesses = k_find_witnesses_knapsack(a, b, order, w, k);
 
     // print: for each sum i from 0 to 2n-2, first the count then the positions
     int R = (int)witnesses.size();

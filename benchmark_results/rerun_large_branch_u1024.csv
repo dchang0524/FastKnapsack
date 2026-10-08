@@ -1,0 +1,9 @@
+problem,method,u,n,target,trial,status,wall_seconds,algorithm_seconds,kernel_seconds,propagation_seconds
+coinchange,simple-dp,1024,1024,8192,0,ok,0.05970212514512241,0.013994,,
+coinchange,deterministic,1024,1024,8192,0,timeout,600.0,,,
+coinchange,randomized-k,1024,1024,8192,0,ok,0.5322794171515852,0.517937,0.517563,0.000328292
+coinchange,optimized-peeling,1024,1024,8192,0,timeout,600.0,,,
+coinchange,paper-random,1024,1024,8192,0,ok,45.645253209164366,45.6259,45.6254,0.000454792
+coinchange,simplified,1024,1024,8192,0,ok,1.4968791669234633,1.48334,1.48293,0.000352458
+knapsack,simple-dp,1024,1024,8192,0,ok,0.012438749894499779,0.00435379,,
+knapsack,paper-kernel,1024,1024,8192,0,ok,0.36750804097391665,0.359428,0.355614,0.00216958

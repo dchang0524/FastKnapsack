@@ -1,4 +1,6 @@
 #include "convolution.h"
+#include "exact_convolution.h"
+#include <stdexcept>
 
 void fft(vector<C>& a) {
 	int n = sz(a), L = 31 - __builtin_clz(n);
@@ -57,13 +59,16 @@ vector<int> convolution(const vector<int>& a, const vector<int>& b) {
 // (max, +) convolution
 vector<ll> maxPlusCnv(const vector<ll>& a, const vector<ll>& b) {
     int n = (int)a.size(), m = (int)b.size(), N = n + m - 1;
-    vector<ll> c(N, NEG_INF);
+    vector<ll> c(N, NEG_INF_LL);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            if (a[i] == NEG_INF || b[j] == NEG_INF) {
+            if (a[i] == NEG_INF_LL || b[j] == NEG_INF_LL) {
                 continue;
             }
-            c[i + j] = max(c[i + j], a[i] + b[j]);
+            const __int128 value = static_cast<__int128>(a[i]) + b[j];
+            if (value <= NEG_INF_LL || value > LLONG_MAX)
+                throw std::overflow_error("max-plus convolution exceeds int64 range");
+            c[i + j] = max(c[i + j], static_cast<ll>(value));
         }
     }
     return c;
@@ -71,20 +76,8 @@ vector<ll> maxPlusCnv(const vector<ll>& a, const vector<ll>& b) {
 
 // Boolean OR‐convolution
 vector<int> boolCnv(const vector<int>& a, const vector<int>& b) {
-    vd a_D(a.size());
-    for (int i = 0; i < a.size(); i++) {
-        a_D[i] = (double)a[i];
-    }
-    vd b_D(b.size());
-    for (int i = 0; i < b.size(); i++) {
-        b_D[i] = (double)b[i];
-    }
-    vd c_D = conv(a_D, b_D);
-    vi c(c_D.size());
-    for (int i = 0; i < c_D.size(); i++) {
-        if (c_D[i] + 0.5 >= 1) {
-            c[i] = 1;
-        }
-    }
-    return c;
+    vector<int> binary_a(a.size()), binary_b(b.size());
+    for (size_t i = 0; i < a.size(); ++i) binary_a[i] = a[i] != 0;
+    for (size_t i = 0; i < b.size(); ++i) binary_b[i] = b[i] != 0;
+    return exact_boolean_convolution(binary_a, binary_b);
 }
